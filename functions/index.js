@@ -1,6 +1,7 @@
 import {initializeApp} from 'firebase-admin/app';
 import {getDatabase} from 'firebase-admin/database';
 import {onCall,HttpsError} from 'firebase-functions/v2/https';
+import {onInit} from 'firebase-functions/v2/core';
 import {defineSecret,defineString} from 'firebase-functions/params';
 import {createHash} from 'node:crypto';
 import nodemailer from 'nodemailer';
@@ -10,9 +11,13 @@ const databaseURL=defineString('DATABASE_URL',{default:'https://hearttoheart-14e
 const mailTo=defineString('MAIL_TO',{default:''});
 const mailFrom=defineString('MAIL_FROM',{default:''});
 const smtp=defineSecret('SMTP_URL');
-initializeApp({databaseURL:emulated?'https://demo-heart-to-heart-default-rtdb.firebaseio.com':databaseURL.value()});
-const db=getDatabase();
-const options={region:'us-central1',maxInstances:5,timeoutSeconds:60};
+let db;
+// Parameters resolve at runtime, after the CLI has analyzed the function exports.
+onInit(()=>{
+  initializeApp({databaseURL:emulated?'https://demo-heart-to-heart-default-rtdb.firebaseio.com':databaseURL.value()});
+  db=getDatabase();
+});
+const options={region:'us-central1',minInstances:0,maxInstances:2,timeoutSeconds:60};
 const hash=value=>createHash('sha256').update(value).digest('hex');
 const validate=(fn,value)=>{try{return fn(value);}catch(error){throw new HttpsError('invalid-argument',error.message);}};
 async function admin(request){if(!request.auth||(await db.ref(`admins/${request.auth.uid}`).get()).val()!==true)throw new HttpsError('permission-denied','Administrator access is required.');}

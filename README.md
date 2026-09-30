@@ -48,7 +48,8 @@ Open `http://127.0.0.1:4173/index.html?emulator=1`. This switch only works on lo
 
 ## Current delivery status
 
-Version 1.1.0 publishes the static website through GitHub Pages. At the owner’s request, live forms, session management, email, and Firebase activation are deferred while Jotform or Google Forms are considered. `assets/js/site-config.js` keeps `backendEnabled` false; loopback emulator mode remains available for testing. No live sessions or test submissions are published. Future Firebase activation requires Firebase Email/Password sign-in, provisioning the addresses in the private `admins.txt`, the database rules, deployed functions, and SMTP configuration. The public website is never given SMTP credentials. See the setup notes for the ordered activation steps and verification checklist.
+Version 1.2.0 connects the GitHub Pages website to Firebase Authentication, Realtime Database, and Cloud Functions. Gmail SMTP credentials stay in Secret Manager; private sender/recipient settings are not published. Approved administrators can manage sessions and read RSVPs/contact messages. No real sessions are preloaded: the group administrators enter their own dates and locations. See [the administrator guide](docs/admin-guide.md) for first sign-in and everyday tasks. Billing alerts/spend caps are separate Google Cloud settings, not guaranteed by the application’s scaling limits.
+
 
 ## GitHub Pages and versions
 

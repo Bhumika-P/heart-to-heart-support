@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.2.0 — 2026-09-30
+
+- Activate Firebase-backed session management, private RSVPs, contact messages, and administrator access.
+- Connect Gmail notifications through a Secret Manager credential, with a masked local setup helper.
+- Initialize database parameters at function startup so production deployments can analyze exports correctly.
+- Allow functions to scale down to zero; limit each to two concurrent instances.
+- Update privacy information and add an administrator guide.
+
 ## 1.1.0 — 2026-09-30
 
 - Build and publish the compiled website to GitHub Pages automatically when main changes, fixing Firebase SDK imports on the live site.

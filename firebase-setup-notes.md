@@ -1,6 +1,6 @@
-# Firebase setup (deferred)
+# Firebase setup
 
-The owner has paused live backend setup while considering Jotform or Google Forms. These are future instructions, not required steps for the current GitHub Pages release. Keep `backendEnabled: false` in `assets/js/site-config.js` until a provider is selected and configured. Do not enable billing or deploy Firebase for this release.
+The owner selected Firebase and enabled Blaze. The frontend remains hosted on GitHub Pages. Activate `backendEnabled` in `assets/js/site-config.js` only after the functions, rules, administrators, and email provider have been configured and verified.
 
 Project: `hearttoheart-14e56`
 
@@ -55,6 +55,10 @@ npx firebase functions:secrets:set SMTP_URL --project hearttoheart-14e56
 ```
 
 Paste the connection string into the CLI secret prompt, not into a public file or chat. A typical format is `smtps://URL_ENCODED_USER:URL_ENCODED_PASSWORD@SMTP_HOST:465`. Use provider-specific SMTP settings. Firebase is the backend; it is not itself a general outbound email provider.
+
+For a Gmail sender with a Google app password, use `scripts/configure-gmail.ps1 -Sender "sender@gmail.com"` from PowerShell. It prompts with masked input, verifies SMTP authentication without sending email, and uploads directly to Secret Manager. It never saves the password in a local file. The sender needs two-step verification and an app password. Changing the Gmail account password can revoke app passwords; rerun this setup and redeploy the functions after rotating the credential.
+
+Functions use zero minimum instances and a maximum of two instances per function. This limits concurrent scaling, not total monthly spending. Configure billing alerts and a Cloud Functions spend cap separately if desired. Keep only recent deployment images with `firebase functions:artifacts:setpolicy --days 1 --project hearttoheart-14e56`.
 
 ## 5. Build and deploy when ready
 
