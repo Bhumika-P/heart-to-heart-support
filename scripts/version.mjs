@@ -1,0 +1,11 @@
+import {readFile,writeFile,mkdir} from 'node:fs/promises';
+import {resolve} from 'node:path';
+const root=resolve(import.meta.dirname,'..');
+const pkg=JSON.parse(await readFile(resolve(root,'package.json'),'utf8'));
+if(!/^\d+\.\d+\.\d+$/.test(pkg.version))throw Error('Expected semantic version X.Y.Z');
+const functionsPath=resolve(root,'functions/package.json');
+const functions=JSON.parse(await readFile(functionsPath,'utf8'));functions.version=pkg.version;
+await writeFile(functionsPath,JSON.stringify(functions,null,2)+'\n');
+await mkdir(resolve(root,'assets/data'),{recursive:true});
+await writeFile(resolve(root,'assets/data/version.txt'),pkg.version+'\n');
+console.log('Synchronized v'+pkg.version);

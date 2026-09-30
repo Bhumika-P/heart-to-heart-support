@@ -1,13 +1,17 @@
-import {auth,db,ref,get,onValue,signInWithEmailAndPassword,signOut,onAuthStateChanged,sendPasswordResetEmail,call} from './firebase-client.js';
+import {auth,db,ref,get,onValue,signInWithEmailAndPassword,signOut,onAuthStateChanged,sendPasswordResetEmail,call,backendReady} from './firebase-client.js';
 import {el,status,errorMessage,eventTime,formData,action} from './ui.js';
 const login=document.querySelector('#login-form'),editor=document.querySelector('#event-form'),panel=document.querySelector('#admin-panel'),authPanel=document.querySelector('#auth-panel'),notice=document.querySelector('#admin-status');
 let events={},rsvps={},messages={},unsubscribers=[],selectedEvent=null,authRevision=0;
 const feedback=editor.querySelector('.form-status');
+login.querySelector('[data-form-fields]').disabled=!backendReady;
+editor.querySelector('[data-form-fields]').disabled=!backendReady;
+if(!backendReady){authPanel.hidden=true;status(notice,'Administration is not connected yet. The website owner is choosing the session and form provider.');}
 login.addEventListener('submit',async event=>{event.preventDefault();const data=formData(login),button=login.querySelector('[type=submit]');button.disabled=true;status(login.querySelector('.form-status'),'Signing in…');try{await signInWithEmailAndPassword(auth,data.email,data.password);login.reset();status(login.querySelector('.form-status'),'');}catch(error){status(login.querySelector('.form-status'),errorMessage(error),true);}finally{button.disabled=false;}});
 document.querySelector('#reset-password').addEventListener('click',async()=>{const email=login.elements.email.value;if(!email||!login.elements.email.checkValidity()){status(login.querySelector('.form-status'),'Enter your email address first.',true);return;}try{await sendPasswordResetEmail(auth,email);status(login.querySelector('.form-status'),'If this account exists, a password-reset email will be sent.');}catch(error){status(login.querySelector('.form-status'),errorMessage(error),true);}});
 document.querySelector('#sign-out').addEventListener('click',()=>signOut(auth));
 function clearPrivate(){unsubscribers.forEach(fn=>fn());unsubscribers=[];events={};rsvps={};messages={};selectedEvent=null;document.querySelector('#admin-events').replaceChildren();document.querySelector('#attendees-list').replaceChildren();document.querySelector('#messages-list').replaceChildren();document.querySelector('#attendees-panel').hidden=true;resetEditor();}
 onAuthStateChanged(auth,async user=>{
+  if(!backendReady)return;
   const revision=++authRevision;clearPrivate();panel.hidden=true;authPanel.hidden=false;notice.textContent='';
   if(!user)return;
   try{

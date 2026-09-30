@@ -1,4 +1,6 @@
-# Firebase setup
+# Firebase setup (deferred)
+
+The owner has paused live backend setup while considering Jotform or Google Forms. These are future instructions, not required steps for the current GitHub Pages release. Keep `backendEnabled: false` in `assets/js/site-config.js` until a provider is selected and configured. Do not enable billing or deploy Firebase for this release.
 
 Project: `hearttoheart-14e56`
 
@@ -62,10 +64,10 @@ npm --prefix functions ci
 npm run build
 npm test
 npx firebase login
-npx firebase deploy --only database,functions,hosting --project hearttoheart-14e56
+npx firebase deploy --only database,functions --project hearttoheart-14e56
 ```
 
-Firebase Hosting deploys only `dist`. Source documents, admin addresses, server email configuration, and credentials are excluded. The generated static website can also be hosted elsewhere, but callable functions and Realtime Database must still be deployed to Firebase.
+GitHub Pages hosts the static website using the repository Actions workflow. After configuring and verifying the backend, set `backendEnabled: true` in `assets/js/site-config.js`, rebuild, and publish through that workflow. Add `bhumika-p.github.io` to Firebase authorized domains. A Firebase backend deployment does not publish the Pages frontend. Source documents, admin addresses, server email configuration, and credentials are excluded from `dist`.
 
 ## 6. Live acceptance check
 

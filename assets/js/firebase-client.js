@@ -3,8 +3,10 @@ import {getAuth, connectAuthEmulator, signInWithEmailAndPassword, signOut, onAut
 import {getDatabase, ref, onValue, get, connectDatabaseEmulator} from 'firebase/database';
 import {getFunctions, httpsCallable, connectFunctionsEmulator} from 'firebase/functions';
 import {firebaseConfig, functionsRegion} from './firebase-config.js';
+import {siteConfig} from './site-config.js';
 // Only localhost builds explicitly opened with ?emulator=1 can reach local emulators.
 const local = ['localhost','127.0.0.1'].includes(location.hostname) && new URLSearchParams(location.search).get('emulator') === '1';
+export const backendReady = siteConfig.backendEnabled || local;
 const config = local ? {...firebaseConfig, projectId:'demo-heart-to-heart', apiKey:'demo-key', databaseURL:'https://demo-heart-to-heart-default-rtdb.firebaseio.com'} : firebaseConfig;
 const app = initializeApp(config);
 export const auth = getAuth(app), db = getDatabase(app), functions = getFunctions(app, functionsRegion);

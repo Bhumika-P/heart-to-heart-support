@@ -1,7 +1,8 @@
-import {db,ref,onValue,call} from './firebase-client.js';
+import {db,ref,onValue,call,backendReady} from './firebase-client.js';
 import {el,status,errorMessage,eventTime,formData,action} from './ui.js';
 const list=document.querySelector('#events-list'),notice=document.querySelector('#schedule-status'),dialog=document.querySelector('#rsvp-dialog'),form=document.querySelector('#rsvp-form');
 let events=[],filter=new URLSearchParams(location.search).get('session')||'all';
+if(form)form.querySelector('[data-form-fields]').disabled=!backendReady;
 if(!['all','morning','evening'].includes(filter))filter='all';
 function render(){
   for(const kind of ['morning','evening']){const upcoming=events.find(e=>e.session===kind);const next=document.querySelector(`[data-next="${kind}"]`);if(next)next.textContent=upcoming?eventTime(upcoming):'Every two weeks · See upcoming dates';}
@@ -15,7 +16,8 @@ function render(){
     list.append(card);
   }
 }
-onValue(ref(db,'events'),snapshot=>{events=Object.entries(snapshot.val()||{}).map(([id,event])=>({id,...event})).filter(e=>e.startAt>Date.now()).sort((a,b)=>a.startAt-b.startAt);render();},()=>{if(notice){notice.textContent='We couldn’t load the schedule. Please try again later or use the Contact page.';notice.classList.add('error');}});
+if(backendReady)onValue(ref(db,'events'),snapshot=>{events=Object.entries(snapshot.val()||{}).map(([id,event])=>({id,...event})).filter(e=>e.startAt>Date.now()).sort((a,b)=>a.startAt-b.startAt);render();},()=>{if(notice){notice.textContent='We couldn’t load the schedule. Please try again later.';notice.classList.add('error');}});
+else render();
 document.querySelectorAll('[data-filter]').forEach(button=>button.addEventListener('click',()=>{filter=button.dataset.filter;render();}));
 let returnFocus;
 function openRsvp(event){returnFocus=document.activeElement;form.reset();form.querySelector('[name=eventId]').value=event.id;document.querySelector('#rsvp-event').textContent=`${event.name} — ${eventTime(event)}`;form.querySelector('.form-status').textContent='';form.querySelector('button[type=submit]').disabled=false;dialog.showModal();}

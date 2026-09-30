@@ -48,4 +48,10 @@ Open `http://127.0.0.1:4173/index.html?emulator=1`. This switch only works on lo
 
 ## Current delivery status
 
-The implementation is local and has not been deployed or pushed. Live activation requires Firebase Email/Password sign-in, provisioning the addresses in the private `admins.txt`, the database rules, deployed functions, and SMTP configuration. The public website is never given SMTP credentials. See the setup notes for the ordered activation steps and verification checklist.
+Version 1.1.0 publishes the static website through GitHub Pages. At the owner’s request, live forms, session management, email, and Firebase activation are deferred while Jotform or Google Forms are considered. `assets/js/site-config.js` keeps `backendEnabled` false; loopback emulator mode remains available for testing. No live sessions or test submissions are published. Future Firebase activation requires Firebase Email/Password sign-in, provisioning the addresses in the private `admins.txt`, the database rules, deployed functions, and SMTP configuration. The public website is never given SMTP credentials. See the setup notes for the ordered activation steps and verification checklist.
+
+## GitHub Pages and versions
+
+The public website is published at https://bhumika-p.github.io/heart-to-heart-support/ by `.github/workflows/pages.yml`. Pages must use **GitHub Actions** as its build source. The workflow builds and tests the site, then publishes only `dist`. Do not publish the source HTML directly: its Firebase imports need bundling.
+
+For a release, run `npm version minor --no-git-tag-version` (or `patch`), then `npm run version:sync`. Run `npm install --package-lock-only` from inside the `functions` directory. Regenerate source HTML with `python scripts/create-pages.py`, update `CHANGELOG.md`, build and test, commit, and tag the matching `vX.Y.Z`. The build checks package/public version consistency and versions CSS/JavaScript URLs.
