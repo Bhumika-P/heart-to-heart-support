@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.2 — 2026-09-30
+
+- Correct the agreement heading to “Leader & Co-Leaders Exception” on the web page and in the Word download.
+
 ## 1.2.1 — 2026-09-30
 
 - Apply the reviewed home-page corrections for emotional abuse, healing tools, community wording, the founder bio, and the founder quote.
