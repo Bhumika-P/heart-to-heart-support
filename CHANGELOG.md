@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.1 — 2026-09-30
+
+- Apply the reviewed home-page corrections for emotional abuse, healing tools, community wording, the founder bio, and the founder quote.
+- Replace the confidentiality agreement with the supplied confidentiality and disclaimer agreement, including recording restrictions, confidentiality limits, personal responsibility, and crisis guidance.
+- Update the printable page, two-page Word download, and related agreement references.
+
 ## 1.2.0 — 2026-09-30
 
 - Activate Firebase-backed session management, private RSVPs, contact messages, and administrator access.
