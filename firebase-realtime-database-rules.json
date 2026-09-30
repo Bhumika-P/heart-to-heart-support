@@ -1,0 +1,10 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "events": {".read": true, ".indexOn": ["startAt"]},
+    "admins": {"$uid": {".read": "auth != null && auth.uid === $uid"}},
+    "rsvps": {".read": "auth != null && root.child('admins').child(auth.uid).val() === true"},
+    "messages": {".read": "auth != null && root.child('admins').child(auth.uid).val() === true"}
+  }
+}

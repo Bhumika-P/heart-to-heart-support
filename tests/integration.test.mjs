@@ -1,0 +1,49 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+const project='demo-heart-to-heart',ns=project+'-default-rtdb';
+const endpoint=`http://127.0.0.1:9000`,authURL='http://127.0.0.1:9099/identitytoolkit.googleapis.com/v1';
+async function database(path,method='GET',data,token){const url=`${endpoint}/${path}.json?ns=${ns}${token&&token!=='owner'?'&auth='+encodeURIComponent(token):''}`;const response=await fetch(url,{method,headers:{'Content-Type':'application/json',...(token==='owner'?{Authorization:'Bearer owner'}:{})},body:data===undefined?undefined:JSON.stringify(data)});return {status:response.status,data:await response.json()};}
+async function signup(email){const response=await fetch(`${authURL}/accounts:signUp?key=demo-key`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:'LocalTestOnly!42',returnSecureToken:true})});const data=await response.json();assert.ok(data.idToken,JSON.stringify(data));return data;}
+async function call(name,data,token){const response=await fetch(`http://127.0.0.1:5001/${project}/us-central1/${name}`,{method:'POST',headers:{'Content-Type':'application/json',...(token?{Authorization:`Bearer ${token}`}:{})},body:JSON.stringify({data})});return {status:response.status,...await response.json()};}
+const event={name:'LOCAL TEST Morning Session',description:'Local emulator session only.',locationTitle:'Test room',address:'123 Example Street',timezone:'America/Chicago',session:'morning',startLocal:'2030-10-26T10:00',endLocal:'2030-10-26T11:30',rsvpOpen:true,occurrences:2};
+test('complete local backend and database privacy flow',async()=>{
+  const rules=JSON.parse(await readFile(new URL('../firebase-realtime-database-rules.json',import.meta.url),'utf8'));
+  assert.equal((await database('.settings/rules','PUT',rules,'owner')).status,200);
+  await database('','PUT',{},'owner');
+  const suffix=Date.now(),admin=await signup(`admin-${suffix}@example.test`),visitor=await signup(`visitor-${suffix}@example.test`);
+  await database(`admins/${admin.localId}`,'PUT',true,'owner');
+  assert.equal((await database('events')).status,200);
+  for(const path of ['rsvps','messages','admins','rateLimits'])assert.notEqual((await database(path)).status,200,`${path} must be private`);
+  assert.notEqual((await database('rsvps','GET',undefined,visitor.idToken)).status,200);
+  assert.notEqual((await database(`admins/${visitor.localId}`,'PUT',true,visitor.idToken)).status,200);
+  assert.notEqual((await database('events/hacked','PUT',event,admin.idToken)).status,200,'Even admins must use validated functions');
+  assert.equal((await call('saveEvent',event)).error.status,'PERMISSION_DENIED');
+  assert.equal((await call('saveEvent',event,visitor.idToken)).error.status,'PERMISSION_DENIED');
+  const saved=await call('saveEvent',event,admin.idToken);assert.ok(saved.result,JSON.stringify(saved));assert.equal(saved.result.ids.length,2);
+  const eventId=saved.result.ids[0];let value=(await database(`events/${eventId}`)).data;
+  const edited=await call('saveEvent',{...value,id:eventId,name:'Edited local session'},admin.idToken);assert.ok(edited.result,JSON.stringify(edited));assert.equal(edited.result.ids[0],eventId);
+  assert.equal((await call('saveEvent',{...value,id:eventId,name:'Stale edit'},admin.idToken)).error.status,'ABORTED');
+  const rsvp={eventId,name:'Local Visitor',email:'local-visitor@example.test'};
+  assert.equal((await call('submitRsvp',rsvp)).result.ok,true);
+  assert.equal((await call('submitRsvp',{...rsvp,name:'Different name'})).result.ok,true);
+  const records=(await database(`rsvps/${eventId}`,'GET',undefined,admin.idToken)).data;
+  assert.equal(Object.keys(records).length,1);const record=Object.values(records)[0];assert.equal(record.name,'Local Visitor');assert.equal(record.delivery.status,'sent');assert.equal(record.delivery.emulated,true);
+  assert.notEqual((await database(`rsvps/${eventId}`)).status,200);
+  value=(await database(`events/${eventId}`)).data;
+  await call('saveEvent',{...value,id:eventId,rsvpOpen:false},admin.idToken);
+  assert.equal((await call('submitRsvp',{...rsvp,email:'closed@example.test'})).error.status,'FAILED_PRECONDITION');
+  const message={name:'Test Sender',email:'test-sender@example.test',subject:'Local test',message:'This is an emulator-only contact message.',requestId:'local-test-token'};
+  assert.equal((await call('submitContact',message)).result.ok,true);
+  assert.equal((await call('submitContact',message)).result.ok,true);
+  const messages=(await database('messages','GET',undefined,admin.idToken)).data;assert.equal(Object.keys(messages).length,1);
+  assert.equal((await call('submitContact',{...message,website:'spam'})).error.status,'INVALID_ARGUMENT');
+  assert.equal((await call('submitContact',{...message,email:'not-an-email'})).error.status,'INVALID_ARGUMENT');
+  const messageId=Object.keys(messages)[0];
+  assert.equal((await call('deleteRecord',{kind:'contact',recordId:messageId},visitor.idToken)).error.status,'PERMISSION_DENIED');
+  await call('deleteRecord',{kind:'contact',recordId:messageId},admin.idToken);assert.equal((await database(`messages/${messageId}`,'GET',undefined,admin.idToken)).data,null);
+  await call('deleteEvent',{id:eventId},admin.idToken);assert.equal((await database(`events/${eventId}`)).data,null);assert.equal((await database(`rsvps/${eventId}`,'GET',undefined,admin.idToken)).data,null);
+  await database(`admins/${admin.localId}`,'DELETE',undefined,'owner');
+  assert.equal((await call('saveEvent',event,admin.idToken)).error.status,'PERMISSION_DENIED');
+  assert.notEqual((await database('messages','GET',undefined,admin.idToken)).status,200);
+});

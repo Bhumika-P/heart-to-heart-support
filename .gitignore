@@ -1,0 +1,13 @@
+node_modules/
+dist/
+.firebase/
+*-debug.log
+*.local
+functions/.env*
+!functions/.env.example
+functions/.secret*
+test-results/
+.env*
+!.env.example
+*service-account*.json
+admins.txt
