@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.7 — 2026-10-01
+
+- Add the $10 session fee and sponsorship information directly beneath the Group Sessions introduction, with a link to contact Sherée.
+
 ## 1.2.6 — 2026-10-01
 
 - Clarify on the home page that the morning and evening sessions are identical teachings.

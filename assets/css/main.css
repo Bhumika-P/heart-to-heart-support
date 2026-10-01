@@ -22,3 +22,5 @@ fieldset:disabled{opacity:.7}
 @media print{.agreement-disclaimer{break-before:page}.agreement h3{font-size:12pt;color:black;break-after:avoid;margin:14px 0 6px}}
 
 .signature-lines p{overflow-wrap:anywhere}
+
+.session-fees{padding-top:32px}
