@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.4 — 2026-09-30
+
+- Apply the reviewed “Leader and co-leaders” wording to the agreement page and Word download.
+
 ## 1.2.3 — 2026-09-30
 
 - Apply the updated “If the leader or co-leader sees a member in public” wording to the agreement page and Word download.
