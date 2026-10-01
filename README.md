@@ -48,7 +48,7 @@ Open `http://127.0.0.1:4173/index.html?emulator=1`. This switch only works on lo
 
 ## Current delivery status
 
-Version 1.2.4 includes the reviewed home-page corrections and updated confidentiality and disclaimer agreement. It connects the GitHub Pages website to Firebase Authentication, Realtime Database, and Cloud Functions. Gmail SMTP credentials stay in Secret Manager; private sender/recipient settings are not published. Approved administrators can manage sessions and read RSVPs/contact messages. No real sessions are preloaded: the group administrators enter their own dates and locations. See [the administrator guide](docs/admin-guide.md) for first sign-in and everyday tasks. Billing alerts/spend caps are separate Google Cloud settings, not guaranteed by the application’s scaling limits.
+Version 1.2.5 includes the reviewed home-page corrections and updated confidentiality and disclaimer agreement. It connects the GitHub Pages website to Firebase Authentication, Realtime Database, and Cloud Functions. Gmail SMTP credentials stay in Secret Manager; private sender/recipient settings are not published. Approved administrators can manage sessions and read RSVPs/contact messages. No real sessions are preloaded: the group administrators enter their own dates and locations. See [the administrator guide](docs/admin-guide.md) for first sign-in and everyday tasks. Billing alerts/spend caps are separate Google Cloud settings, not guaranteed by the application’s scaling limits.
 
 
 ## GitHub Pages and versions

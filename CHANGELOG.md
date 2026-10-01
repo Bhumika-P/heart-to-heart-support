@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.5 — 2026-10-01
+
+- Change the home-page founder button from “Our Story” to “Her Story.”
+
 ## 1.2.4 — 2026-09-30
 
 - Apply the reviewed “Leader and co-leaders” wording to the agreement page and Word download.
