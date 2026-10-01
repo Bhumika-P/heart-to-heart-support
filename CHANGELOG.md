@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.6 — 2026-10-01
+
+- Clarify on the home page that the morning and evening sessions are identical teachings.
+
 ## 1.2.5 — 2026-10-01
 
 - Change the home-page founder button from “Our Story” to “Her Story.”
