@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.3 — 2026-09-30
+
+- Apply the updated “If the leader or co-leader sees a member in public” wording to the agreement page and Word download.
+
 ## 1.2.2 — 2026-09-30
 
 - Correct the agreement heading to “Leader & Co-Leaders Exception” on the web page and in the Word download.
