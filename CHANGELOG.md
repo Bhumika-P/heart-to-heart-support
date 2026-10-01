@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.8 — 2026-10-01
+
+- Correct the sponsorship box location to the entry of the meeting room.
+
 ## 1.2.7 — 2026-10-01
 
 - Add the $10 session fee and sponsorship information directly beneath the Group Sessions introduction, with a link to contact Sherée.
