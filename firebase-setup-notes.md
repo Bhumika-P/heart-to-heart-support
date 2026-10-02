@@ -46,7 +46,7 @@ Manual alternative: create each user in Authentication → Users, copy their UID
 
 The public contact form and RSVP form use callable functions. Each submission is stored privately and an email notification is attempted. The admin dashboard shows pending, sending, sent, or failed delivery and offers a retry for unsent notifications. A saved submission remains visible if email delivery fails. SMTP has no universal exactly-once guarantee: after an interrupted delivery, a retry can produce a duplicate email.
 
-Enable the Blaze billing plan before deploying Cloud Functions. Set up the desired SMTP provider and a verified sending address. The receiving address is supplied in the original `CONTACT.docx`; keep it in server configuration.
+Enable the Blaze billing plan before deploying Cloud Functions. Set up the desired SMTP provider and a verified sending address. The notification recipient is `hthlifecoaching@gmail.com`; keep mail routing in server configuration.
 
 Copy `functions/.env.example` to `functions/.env.hearttoheart-14e56` and fill `MAIL_TO` and `MAIL_FROM`. Keep this file private. The SMTP connection string is stored in Firebase Secret Manager:
 
@@ -82,3 +82,15 @@ Sign in with each intended admin account. Create a real session, edit it, verify
 The event editor creates 1–26 occurrences every two weeks, preserving local wall-clock time across daylight saving transitions. Each occurrence is independently editable. Start/end dates and timezone are explicit. Events are ordered by date, public pages hide past sessions, and RSVPs can be closed. Deleting an event permanently removes its related website RSVP records after confirmation; administrators should contact affected attendees before deleting an event that people planned to attend.
 
 The RSVP form requests exactly name and email. The confidentiality document is available to read, print with signature lines, and download in its original Word format. No electronic signature requirement was inferred from the source document.
+
+## Change the notification recipient
+
+Set `MAIL_TO=hthlifecoaching@gmail.com` in the private `functions/.env.hearttoheart-14e56` file. Preserve the existing `MAIL_FROM` and SMTP secret when changing only the destination inbox. An existing deployed `MAIL_TO` value overrides the source default, so a GitHub Pages release alone does not change live email routing.
+
+With Firebase access to `hearttoheart-14e56`, deploy the three email-producing functions:
+
+```sh
+npx firebase deploy --project hearttoheart-14e56 --only functions:submitRsvp,functions:submitContact,functions:retryNotification
+```
+
+Verify that all three deployed functions have `MAIL_TO=hthlifecoaching@gmail.com`. Then use a clearly labeled test contact message and a test RSVP to confirm delivery to the new inbox. Existing messages remain in the admin dashboard; messages previously delivered to the old inbox are not moved.

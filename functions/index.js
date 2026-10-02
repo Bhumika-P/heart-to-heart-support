@@ -8,7 +8,7 @@ import nodemailer from 'nodemailer';
 import {text,id,eventInput,occurrences,rsvpInput,contactInput} from './validation.js';
 const emulated=process.env.FUNCTIONS_EMULATOR==='true';
 const databaseURL=defineString('DATABASE_URL',{default:'https://hearttoheart-14e56-default-rtdb.firebaseio.com'});
-const mailTo=defineString('MAIL_TO',{default:''});
+const mailTo=defineString('MAIL_TO',{default:'hthlifecoaching@gmail.com'});
 const mailFrom=defineString('MAIL_FROM',{default:''});
 const smtp=defineSecret('SMTP_URL');
 let db;

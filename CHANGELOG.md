@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.9 — 2026-10-01
+
+- Set hthlifecoaching@gmail.com as the backend notification recipient default for RSVP, contact, and retry notifications.
+- Update the email configuration template and document the separate Firebase deployment required to change existing live routing.
+
 ## 1.2.8 — 2026-10-01
 
 - Correct the sponsorship box location to the entry of the meeting room.

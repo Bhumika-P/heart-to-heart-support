@@ -12,7 +12,7 @@ Locations and descriptions are public. Do not include private meeting passwords 
 
 ## RSVPs and messages
 
-Select **View RSVPs** for a session to see the private participant list. Select **Contact Messages** to read incoming messages. Notifications are sent to the private inbox configured by the website owner. **Email notification: sent** means the email server accepted it; check the receiving inbox for delivery.
+Select **View RSVPs** for a session to see the private participant list. Select **Contact Messages** to read incoming messages. The notification recipient is now configured as hthlifecoaching@gmail.com. This destination takes effect after the notification functions are redeployed with the updated MAIL_TO setting. **Email notification: sent** means the email server accepted it; check the receiving inbox for delivery.
 
 If delivery shows failed or pending, the submission is still stored. Use **Retry Email** after the email configuration is restored. Do not repeatedly retry a message already accepted by the email server. Treat participant details and message content as confidential.
 
