@@ -11,3 +11,22 @@ test('public HTML preserves the complete source home and about wording',async()=
 test('rules expose events only and never permit direct client writes',async()=>{const rules=JSON.parse(await readFile(new URL('../firebase-realtime-database-rules.json',import.meta.url),'utf8'));assert.equal(rules.rules['.read'],false);assert.equal(rules.rules['.write'],false);assert.equal(rules.rules.events['.read'],true);assert.match(rules.rules.rsvps['.read'],/admins/);assert.match(rules.rules.messages['.read'],/admins/);});
 test('release versions agree in packages, public metadata, and every built footer',async()=>{const root=resolve(import.meta.dirname,'..');const pkg=JSON.parse(await readFile(resolve(root,'package.json'),'utf8'));const functions=JSON.parse(await readFile(resolve(root,'functions/package.json'),'utf8'));assert.equal(functions.version,pkg.version);assert.equal((await readFile(resolve(root,'dist/assets/data/version.txt'),'utf8')).trim(),pkg.version);for(const file of (await readdir(resolve(root,'dist'))).filter(f=>f.endsWith('.html'))){assert.ok((await readFile(resolve(root,'dist',file),'utf8')).includes(`<span data-version>v${pkg.version}</span>`));}});
 test('all internal HTML file links resolve and public build excludes private source files',async()=>{const root=resolve(import.meta.dirname,'..');for(const file of (await readdir(root)).filter(f=>f.endsWith('.html'))){const page=await readFile(resolve(root,file),'utf8');for(const match of page.matchAll(/(?:href|src)="([^"]+)"/g)){const url=match[1];if(/^(https?:|#|mailto:)/.test(url))continue;const path=decodeURIComponent(url.split(/[?#]/)[0]);if(path.startsWith('assets/js/'))continue;await readFile(resolve(root,path));}}const dist=await readdir(resolve(root,'dist'));assert.ok(!dist.includes('admins.txt'));assert.ok(!dist.includes('functions'));const contact=await readFile(resolve(root,'dist/contact.html'),'utf8');assert.ok(!contact.includes('heartsriseagain@gmail.com'));});
+
+import {participantMail,reminderDue} from '../functions/participant-mail.js';
+test('reminders require opt-in, remain within the send window, and stop once sent',()=>{
+ const now=100000000,event={startAt:now+24*3600000};
+ assert.equal(reminderDue(event,{reminderOptIn:true},now),true);
+ assert.equal(reminderDue(event,{reminderOptIn:false},now),false);
+ assert.equal(reminderDue(event,{reminderOptIn:true,reminderDelivery:{status:'sent'}},now),false);
+ assert.equal(reminderDue({startAt:now-1},{reminderOptIn:true},now),false);
+ assert.equal(reminderDue({startAt:now+26*3600000},{reminderOptIn:true},now),false);
+ assert.equal(reminderDue({startAt:now+30*60000},{reminderOptIn:true},now),false);
+ assert.equal(reminderDue(event,{reminderOptIn:true,reminderDelivery:{status:'failed'}},now),true);
+});
+test('confirmation and reminder include the selected session and contact information',()=>{
+ const event={name:'Morning meeting',startAt:Date.UTC(2030,0,1,16),endAt:Date.UTC(2030,0,1,18),timezone:'America/Chicago',locationTitle:'Community Room',address:'123 Example Street'};
+ const confirmation=participantMail({reminderOptIn:true},event);
+ for(const phrase of ['Morning meeting','10:00 AM','12:00 PM','Community Room','123 Example Street','$10','hthlifecoaching@gmail.com','schedule.html','requested a reminder'])assert.ok(confirmation.includes(phrase),phrase);
+ assert.ok(!participantMail({reminderOptIn:false},event).includes('requested a reminder'));
+ assert.ok(participantMail({},event,true).includes('requested reminder'));
+});

@@ -19,3 +19,15 @@ If delivery shows failed or pending, the submission is still stored. Use **Retry
 ## Before the first meeting
 
 Publish the actual dates and locations, check them on the public schedule, and read the confidentiality agreement. Members can read, print, or download the original agreement. The website does not collect electronic signatures, payments, or member accounts.
+
+## Release 1.3.0: RSVP viewer and private follow-up
+
+Click **View RSVPs** for a session to open the private RSVP dialog. It opens in Cards mode; choose Expandable List for collapsible attendee rows. Only the X closes the viewer. Names and email addresses stay private to authorized administrators.
+
+Each record shows administrator notification and participant-confirmation delivery separately. Retry a failed confirmation from that record. Save attendance, reminder preference, sponsorship status (none/requested/arranged), and a private sponsorship note. Use the reminder checkbox to stop a participant's requested reminder if they ask. Do not enable reminders without the participant's permission. Contact messages can be marked handled or unhandled.
+
+New RSVPs receive a confirmation email. A visitor can explicitly opt in to one reminder roughly 24 hours before the selected session. An hourly scheduled function checks upcoming sessions and uses per-record delivery locks. Existing RSVP records have no reminder consent and will not be enrolled automatically. Gmail sends each email individually; no attendee list is shared with other participants.
+
+Deploy `submitRsvp`, `retryNotification`, `updatePrivateRecord`, and `sendSessionReminders` plus the database rules with the Firebase CLI. The scheduled function needs Cloud Scheduler; Firebase may require the relevant Google Cloud APIs and billing already used for the existing functions. GitHub Pages publishing alone does not deploy these functions. Retain the existing SMTP_URL secret and MAIL_FROM/MAIL_TO settings.
+
+The agreement PDF is generated from the reviewed text in `docs/source-content.json` using `scripts/create-agreement-pdf.py` (ReportLab). Actual cover images come from Sherée's author Books page; see `docs/image-assets.md`.

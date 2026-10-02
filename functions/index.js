@@ -1,6 +1,8 @@
 import {initializeApp} from 'firebase-admin/app';
 import {getDatabase} from 'firebase-admin/database';
 import {onCall,HttpsError} from 'firebase-functions/v2/https';
+import {onSchedule} from 'firebase-functions/v2/scheduler';
+import {participantMail,reminderDue} from './participant-mail.js';
 import {onInit} from 'firebase-functions/v2/core';
 import {defineSecret,defineString} from 'firebase-functions/params';
 import {createHash} from 'node:crypto';
@@ -31,8 +33,8 @@ async function throttle(request,kind,email){
     });if(!result.committed)throw new HttpsError('resource-exhausted','Too many requests. Please try again in an hour.');
   }
 }
-async function notify(path,subject,body,replyTo){
-  const delivery=db.ref(`${path}/delivery`);
+async function notify(path,subject,body,replyTo,to=mailTo.value(),field='delivery'){
+  const delivery=db.ref(`${path}/${field}`);
   const lock=await delivery.transaction(old=>{
     if(old?.status==='sent'||(old?.status==='sending'&&old.at>Date.now()-120000))return;
     return {status:'sending',at:Date.now()};
@@ -42,7 +44,7 @@ async function notify(path,subject,body,replyTo){
     if(emulated){await delivery.set({status:'sent',at:Date.now(),emulated:true});return;}
     if(!mailTo.value()||!mailFrom.value()||!smtp.value())throw Error('Email provider not configured');
     const transport=nodemailer.createTransport(smtp.value(),{connectionTimeout:10000,socketTimeout:15000});
-    await transport.sendMail({from:mailFrom.value(),to:mailTo.value(),replyTo,subject,text:body});
+    await transport.sendMail({from:mailFrom.value(),to,replyTo,subject,text:body});
     await delivery.set({status:'sent',at:Date.now()});
   }catch{await delivery.set({status:'failed',at:Date.now()});}
 }
@@ -76,10 +78,13 @@ export const submitRsvp=onCall({...options,secrets:[smtp]},async request=>{
   const event=(await db.ref(`events/${data.eventId}`).get()).val();
   if(!event||!event.rsvpOpen||event.startAt<=Date.now())throw new HttpsError('failed-precondition','This session is no longer accepting RSVPs. Please choose another session.');
   const key=hash(data.email),path=`rsvps/${data.eventId}/${key}`;
-  const record={name:data.name,email:data.email,createdAt:Date.now(),delivery:{status:'pending',at:Date.now()}};
+  const record={name:data.name,email:data.email,reminderOptIn:data.reminderOptIn,createdAt:Date.now(),delivery:{status:'pending',at:Date.now()}};
   const result=await db.ref(path).transaction(old=>old?undefined:record);
   // A repeat never overwrites someone else's name or reveals whether they registered.
-  if(result.committed)await notify(path,`Session RSVP: ${event.name}`,rsvpMail(record,event),data.email);
+  if(result.committed)await Promise.all([
+    notify(path,`Session RSVP: ${event.name}`,rsvpMail(record,event),data.email),
+    notify(path,'Your session reservation',participantMail(record,event),mailTo.value(),record.email,'confirmationDelivery')
+  ]);
   return {ok:true,message:'Thank you. Your RSVP has been received. We look forward to welcoming you.'};
 });
 export const submitContact=onCall({...options,secrets:[smtp]},async request=>{
@@ -97,18 +102,46 @@ export const retryNotification=onCall({...options,secrets:[smtp]},async request=
     const eventId=validate(id,data.eventId),recordId=validate(id,data.recordId);path=`rsvps/${eventId}/${recordId}`;
     [record,event]=await Promise.all([db.ref(path).get().then(s=>s.val()),db.ref(`events/${eventId}`).get().then(s=>s.val())]);
     if(!record||!event)throw new HttpsError('not-found','Record not found.');
-    await notify(path,`Session RSVP: ${event.name}`,rsvpMail(record,event),record.email);
+    if(data.audience==='participant')await notify(path,'Your session reservation',participantMail(record,event),mailTo.value(),record.email,'confirmationDelivery');
+    else await notify(path,`Session RSVP: ${event.name}`,rsvpMail(record,event),record.email);
   }else if(data.kind==='contact'){
     path=`messages/${validate(id,data.recordId)}`;record=(await db.ref(path).get()).val();
     if(!record)throw new HttpsError('not-found','Message not found.');
     await notify(path,`Website contact: ${record.subject}`,`Name: ${record.name}\nEmail: ${record.email}\n\n${record.message}`,record.email);
   }else throw new HttpsError('invalid-argument','Invalid notification type.');
-  return {status:(await db.ref(`${path}/delivery/status`).get()).val()};
+  return {status:(await db.ref(`${path}/${data.audience==='participant'?'confirmationDelivery':'delivery'}/status`).get()).val()};
 });
 export const deleteRecord=onCall(options,async request=>{
   await admin(request);const data=request.data||{},key=validate(id,data.recordId);
   if(data.kind==='contact')await db.ref(`messages/${key}`).remove();
   else if(data.kind==='rsvp')await db.ref(`rsvps/${validate(id,data.eventId)}/${key}`).remove();
   else throw new HttpsError('invalid-argument','Invalid record type.');
+  return {ok:true};
+});
+
+// Hourly sweep sends one opted-in reminder in the day before each meeting.
+// Independent delivery locks prevent repeated scheduler invocations from resending.
+export const sendSessionReminders=onSchedule({...options,schedule:'every 60 minutes',timeZone:'America/Chicago',secrets:[smtp]},async()=>{
+  const now=Date.now();
+  const events=(await db.ref('events').orderByChild('startAt').startAt(now+3600000).endAt(now+25*3600000).get()).val()||{};
+  for(const [eventId,event] of Object.entries(events)){
+    const records=(await db.ref(`rsvps/${eventId}`).get()).val()||{};
+    for(const [key,record] of Object.entries(records))if(reminderDue(event,record,now)){
+      await notify(`rsvps/${eventId}/${key}`,'Your upcoming session reminder',participantMail(record,event,true),mailTo.value(),record.email,'reminderDelivery');
+    }
+  }
+});
+export const updatePrivateRecord=onCall(options,async request=>{
+  await admin(request);const data=request.data||{},key=validate(id,data.recordId);let path,patch;
+  if(data.kind==='contact'){
+    if(typeof data.handled!=='boolean')throw new HttpsError('invalid-argument','Choose a message status.');
+    path=`messages/${key}`;patch={handled:data.handled};
+  }else if(data.kind==='rsvp'){
+    path=`rsvps/${validate(id,data.eventId)}/${key}`;
+    if(typeof data.attended!=='boolean'||typeof data.reminderOptIn!=='boolean'||!['none','requested','arranged'].includes(data.sponsorshipStatus))throw new HttpsError('invalid-argument','Choose valid attendance, reminder, and sponsorship settings.');
+    patch={attended:data.attended,reminderOptIn:data.reminderOptIn,sponsorshipStatus:data.sponsorshipStatus,sponsorshipNote:validate(v=>text(v,'Sponsorship note',1000,0),data.sponsorshipNote||'')};
+  }else throw new HttpsError('invalid-argument','Invalid record type.');
+  const result=await db.ref(path).transaction(old=>old?{...old,...patch,adminUpdatedAt:Date.now()}:null);
+  if(!result.snapshot.exists())throw new HttpsError('not-found','Record not found.');
   return {ok:true};
 });

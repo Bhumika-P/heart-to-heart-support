@@ -27,5 +27,5 @@ export function occurrences(data, now=Date.now()){
   if(!Number.isInteger(count)||count<1||count>26)throw Error('Choose 1–26 sessions.');
   return Array.from({length:count},(_,n)=>eventInput({...data,startLocal:DateTime.fromISO(base.startLocal,{zone:base.timezone}).plus({weeks:2*n}).toFormat("yyyy-MM-dd'T'HH:mm"),endLocal:DateTime.fromISO(base.endLocal,{zone:base.timezone}).plus({weeks:2*n}).toFormat("yyyy-MM-dd'T'HH:mm")},now));
 }
-export function rsvpInput(data){return {eventId:id(data.eventId),name:text(data.name,'Name',120),email:email(data.email)};}
+export function rsvpInput(data){return {eventId:id(data.eventId),name:text(data.name,'Name',120),email:email(data.email),reminderOptIn:data.reminderOptIn===true};}
 export function contactInput(data){return {name:text(data.name,'Name',120),email:email(data.email),subject:text(data.subject,'Subject',160),message:text(data.message,'Message',5000,10)};}
