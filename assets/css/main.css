@@ -36,3 +36,11 @@ fieldset:disabled{opacity:.7}
 @media(max-width:650px){#attendees-title{font-size:1.8rem;line-height:1.15}}
 
 .book-card .published-book-cover{object-fit:fill}
+
+/* Keep hero text clear of the scenery and align resource actions per row. */
+.hero-description{max-width:420px}
+.book-card{display:flex;flex-direction:column;align-items:flex-start}
+.book-card .published-book-cover{flex-shrink:0;margin-bottom:0}
+.book-card p{margin-bottom:14px}
+.book-card .button{margin-top:auto}
+.book-card:last-child .published-book-cover{outline:1px solid #c9b8a5;outline-offset:-1px}
