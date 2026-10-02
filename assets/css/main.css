@@ -35,4 +35,4 @@ fieldset:disabled{opacity:.7}
 #attendees-dialog .dialog-close{position:sticky;top:0;float:right;background:var(--cream,#faf7f2);z-index:2}
 @media(max-width:650px){#attendees-title{font-size:1.8rem;line-height:1.15}}
 
-.book-card:nth-child(-n+3) .published-book-cover{object-fit:fill}
+.book-card .published-book-cover{object-fit:fill}
