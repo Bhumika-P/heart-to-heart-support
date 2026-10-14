@@ -23,4 +23,17 @@ let returnFocus;
 function openRsvp(event){returnFocus=document.activeElement;form.reset();form.querySelector('[name=eventId]').value=event.id;document.querySelector('#rsvp-event').textContent=`${event.name} — ${eventTime(event)}`;form.querySelector('.form-status').textContent='';form.querySelector('button[type=submit]').disabled=false;dialog.showModal();}
 dialog?.querySelector('.dialog-close').addEventListener('click',()=>dialog.close());
 dialog?.addEventListener('close',()=>returnFocus?.focus());
-form?.addEventListener('submit',async event=>{event.preventDefault();const button=form.querySelector('button[type=submit]'),feedback=form.querySelector('.form-status');button.disabled=true;status(feedback,'Sending your RSVP…');try{const result=await call('submitRsvp',{...formData(form),reminderOptIn:form.elements.reminderOptIn.checked});status(feedback,result.message);form.querySelectorAll('input:not([type=hidden]):not([type=checkbox])').forEach(i=>i.value='');form.elements.reminderOptIn.checked=false;}catch(error){status(feedback,errorMessage(error),true);button.disabled=false;}});
+form?.addEventListener('submit',async event=>{event.preventDefault();const button=form.querySelector('button[type=submit]'),feedback=form.querySelector('.form-status');button.disabled=true;status(feedback,'Sending your RSVP…');try{const result=await call('submitRsvp',{...formData(form),reminderOptIn:form.elements.reminderOptIn.checked,subscriptionOptIn:form.elements.subscriptionOptIn.checked});status(feedback,result.message);form.querySelectorAll('input:not([type=hidden]):not([type=checkbox])').forEach(i=>i.value='');form.elements.reminderOptIn.checked=false;form.elements.subscriptionOptIn.checked=false;}catch(error){status(feedback,errorMessage(error),true);button.disabled=false;}});
+
+const subscribeDialog=document.querySelector('#subscribe-dialog'),subscribeForm=document.querySelector('#subscribe-form'),subscribeButton=document.querySelector('#open-subscribe');
+if(subscribeForm)subscribeForm.querySelector('[data-form-fields]').disabled=!backendReady;
+if(subscribeButton)subscribeButton.disabled=!backendReady;
+let subscribeFocus;
+subscribeButton?.addEventListener('click',()=>{subscribeFocus=document.activeElement;subscribeForm.reset();subscribeForm.querySelector('.form-status').textContent='';subscribeForm.querySelector('button[type=submit]').disabled=false;subscribeDialog.showModal();});
+subscribeDialog?.querySelector('.dialog-close').addEventListener('click',()=>subscribeDialog.close());
+subscribeDialog?.addEventListener('close',()=>subscribeFocus?.focus());
+subscribeForm?.addEventListener('submit',async event=>{
+  event.preventDefault();const button=subscribeForm.querySelector('button[type=submit]'),feedback=subscribeForm.querySelector('.form-status');button.disabled=true;status(feedback,'Requesting your subscription…');
+  try{const result=await call('subscribeToEvents',formData(subscribeForm));status(feedback,result.message);subscribeForm.elements.email.value='';}
+  catch(error){status(feedback,errorMessage(error),true);button.disabled=false;}
+});

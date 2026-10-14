@@ -3,11 +3,12 @@ import {getDatabase} from 'firebase-admin/database';
 import {onCall,HttpsError} from 'firebase-functions/v2/https';
 import {onSchedule} from 'firebase-functions/v2/scheduler';
 import {participantMail,reminderDue} from './participant-mail.js';
+import {subscriptionService,parseSubscriptionToken} from './event-subscriptions.js';
 import {onInit} from 'firebase-functions/v2/core';
 import {defineSecret,defineString} from 'firebase-functions/params';
 import {createHash} from 'node:crypto';
 import nodemailer from 'nodemailer';
-import {text,id,eventInput,occurrences,rsvpInput,contactInput} from './validation.js';
+import {text,id,email,eventInput,occurrences,rsvpInput,contactInput} from './validation.js';
 const emulated=process.env.FUNCTIONS_EMULATOR==='true';
 const databaseURL=defineString('DATABASE_URL',{default:'https://hearttoheart-14e56-default-rtdb.firebaseio.com'});
 const mailTo=defineString('MAIL_TO',{default:'hthlifecoaching@gmail.com'});
@@ -33,20 +34,23 @@ async function throttle(request,kind,email){
     });if(!result.committed)throw new HttpsError('resource-exhausted','Too many requests. Please try again in an hour.');
   }
 }
-async function notify(path,subject,body,replyTo,to=mailTo.value(),field='delivery'){
+async function notify(path,subject,body,replyTo,to=mailTo.value(),field='delivery',beforeSend){
+  if(beforeSend&&!await beforeSend())return false;
   const delivery=db.ref(`${path}/${field}`);
   const lock=await delivery.transaction(old=>{
     if(old?.status==='sent'||(old?.status==='sending'&&old.at>Date.now()-120000))return;
     return {status:'sending',at:Date.now()};
   });
-  if(!lock.committed)return;
+  if(!lock.committed)return lock.snapshot.val()?.status==='sent';
   try{
-    if(emulated){await delivery.set({status:'sent',at:Date.now(),emulated:true});return;}
+    if(beforeSend&&!await beforeSend()){await delivery.set({status:'cancelled',at:Date.now()});return false;}
+    if(emulated){await delivery.set({status:'sent',at:Date.now(),emulated:true});return true;}
     if(!mailTo.value()||!mailFrom.value()||!smtp.value())throw Error('Email provider not configured');
     const transport=nodemailer.createTransport(smtp.value(),{connectionTimeout:10000,socketTimeout:15000});
     await transport.sendMail({from:mailFrom.value(),to,replyTo,subject,text:body});
     await delivery.set({status:'sent',at:Date.now()});
-  }catch{await delivery.set({status:'failed',at:Date.now()});}
+    return true;
+  }catch{await delivery.set({status:'failed',at:Date.now()});return false;}
 }
 function rsvpMail(record,event){return `A session RSVP has been received.\n\nName: ${record.name}\nEmail: ${record.email}\nSession: ${event.name}\nWhen: ${new Intl.DateTimeFormat('en-US',{dateStyle:'full',timeStyle:'short',timeZone:event.timezone}).format(event.startAt)} (${event.timezone})\nLocation: ${event.locationTitle}\n${event.address}\n\nView attendees in the admin dashboard. Please keep participant information confidential.`;}
 export const saveEvent=onCall(options,async request=>{
@@ -85,7 +89,33 @@ export const submitRsvp=onCall({...options,secrets:[smtp]},async request=>{
     notify(path,`Session RSVP: ${event.name}`,rsvpMail(record,event),data.email),
     notify(path,'Your session reservation',participantMail(record,event),mailTo.value(),record.email,'confirmationDelivery')
   ]);
-  return {ok:true,message:'Thank you. Your RSVP has been received. We look forward to welcoming you.'};
+  let subscriptionMessage='';
+  if(data.subscriptionOptIn){
+    try{const sent=await subscriptionService(db,notify).request(data.email);subscriptionMessage=sent===false?' Your RSVP is saved, but we could not send the subscription confirmation. Please use Subscribe at the top of the schedule to try again.':' Please check your inbox to confirm upcoming-event emails. If already subscribed, you’re all set.';}
+    catch{subscriptionMessage=' Your RSVP is saved, but the subscription request could not be completed. Please use Subscribe at the top of the schedule to try again.';}
+  }
+  return {ok:true,message:'Thank you. Your RSVP has been received. We look forward to welcoming you.'+subscriptionMessage};
+});
+
+export const subscribeToEvents=onCall({...options,secrets:[smtp]},async request=>{
+  const address=validate(email,request.data?.email);await throttle(request,'subscription',address);
+  const sent=await subscriptionService(db,notify).request(address);
+  if(sent===false)throw new HttpsError('unavailable','We could not send the confirmation email. Please try subscribing again later.');
+  return {ok:true,message:'Please check your inbox to confirm upcoming-event emails. If you are already subscribed, you’re all set.'};
+});
+export const confirmEventSubscription=onCall(options,async request=>{
+  const token=request.data?.token;validate(parseSubscriptionToken,token);
+  try{await subscriptionService(db,notify).confirm(token);}catch(error){throw new HttpsError('failed-precondition',error.message);}
+  return {ok:true,message:'You’re subscribed! We’ll email you about one week before each upcoming meeting date. This does not reserve a place or change your 24-hour RSVP reminders.'};
+});
+export const unsubscribeFromEvents=onCall(options,async request=>{
+  const token=request.data?.token;validate(parseSubscriptionToken,token);
+  try{await subscriptionService(db,notify).unsubscribe(token);}catch(error){throw new HttpsError('failed-precondition',error.message);}
+  return {ok:true,message:'You have unsubscribed from upcoming-event emails. Your RSVPs and separately requested 24-hour session reminders are unchanged.'};
+});
+
+export const sendUpcomingEventInvitations=onSchedule({...options,schedule:'every 60 minutes',timeZone:'America/Chicago',timeoutSeconds:540,secrets:[smtp]},async()=>{
+  await subscriptionService(db,notify).sendInvitations();
 });
 export const submitContact=onCall({...options,secrets:[smtp]},async request=>{
   const data=validate(contactInput,request.data||{});await throttle(request,'contact',data.email);

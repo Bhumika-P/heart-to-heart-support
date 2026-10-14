@@ -19,5 +19,5 @@ for(const name of await readdir(root)){if(name.endsWith('.html')){
 }}
 for(const folder of ['css','img','files','data'])await cp(resolve(root,'assets',folder),resolve(dist,'assets',folder),{recursive:true});
 await writeFile(resolve(dist,'.nojekyll'),'');
-await build({absWorkingDir:root,entryPoints:['assets/js/site.js','assets/js/schedule.js','assets/js/contact.js','assets/js/admin.js'],outdir:'dist/assets/js',bundle:true,splitting:true,format:'esm',minify:true,target:['es2022'],sourcemap:false});
+await build({absWorkingDir:root,entryPoints:['assets/js/site.js','assets/js/schedule.js','assets/js/contact.js','assets/js/admin.js','assets/js/subscription.js'],outdir:'dist/assets/js',bundle:true,splitting:true,format:'esm',minify:true,target:['es2022'],sourcemap:false});
 console.log('Built static website in dist/');

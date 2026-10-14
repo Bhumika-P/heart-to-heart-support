@@ -13,6 +13,39 @@ test('release versions agree in packages, public metadata, and every built foote
 test('all internal HTML file links resolve and public build excludes private source files',async()=>{const root=resolve(import.meta.dirname,'..');for(const file of (await readdir(root)).filter(f=>f.endsWith('.html'))){const page=await readFile(resolve(root,file),'utf8');for(const match of page.matchAll(/(?:href|src)="([^"]+)"/g)){const url=match[1];if(/^(https?:|#|mailto:)/.test(url))continue;const path=decodeURIComponent(url.split(/[?#]/)[0]);if(path.startsWith('assets/js/'))continue;await readFile(resolve(root,path));}}const dist=await readdir(resolve(root,'dist'));assert.ok(!dist.includes('admins.txt'));assert.ok(!dist.includes('functions'));const contact=await readFile(resolve(root,'dist/contact.html'),'utf8');assert.ok(!contact.includes('heartsriseagain@gmail.com'));});
 
 import {participantMail,reminderDue} from '../functions/participant-mail.js';
+import {meetingGroups,invitationDue,invitationMail,parseSubscriptionToken,subscriptionLink} from '../functions/event-subscriptions.js';
+import {DateTime} from '../functions/node_modules/luxon/build/es6/luxon.mjs';
+test('subscription opt-in is explicit and independent of the 24-hour reminder',()=>{
+ const data={eventId:'event',name:'Visitor',email:'visitor@example.test'};
+ assert.equal(rsvpInput(data).subscriptionOptIn,false);
+ assert.equal(rsvpInput({...data,subscriptionOptIn:'on',reminderOptIn:true}).subscriptionOptIn,false);
+ assert.equal(rsvpInput({...data,subscriptionOptIn:true}).reminderOptIn,false);
+ assert.equal(rsvpInput({...data,reminderOptIn:true}).subscriptionOptIn,false);
+});
+test('one calendar-week invitation groups both sessions and preserves local time across DST',()=>{
+ const morning=eventInput({...base,startLocal:'2030-11-04T10:00',endLocal:'2030-11-04T11:30'},0);
+ const evening=eventInput({...base,session:'evening',startLocal:'2030-11-04T18:00',endLocal:'2030-11-04T19:30'},0);
+ const next=eventInput({...base,startLocal:'2030-11-18T10:00',endLocal:'2030-11-18T11:30'},0);
+ const groups=meetingGroups({morning,evening,next},0);
+ assert.equal(groups.length,2);assert.equal(groups[0].sessions.length,2);
+ assert.equal(DateTime.fromMillis(groups[0].dueAt,{zone:base.timezone}).toFormat("yyyy-MM-dd'T'HH:mm"),'2030-10-28T10:00');
+ assert.equal(morning.startAt-groups[0].dueAt,7*86400000+3600000);
+ const active={status:'active',confirmedAt:groups[0].dueAt-1};
+ assert.equal(invitationDue(groups[0],active,groups[0].dueAt-1),false);
+ assert.equal(invitationDue(groups[0],active,groups[0].dueAt),true);
+ assert.equal(invitationDue(groups[0],{...active,status:'pending'},groups[0].dueAt),false);
+ assert.equal(invitationDue(groups[0],{...active,status:'unsubscribed'},groups[0].dueAt),false);
+ assert.equal(invitationDue(groups[0],active,groups[0].dueAt+86400000),false);
+ const body=invitationMail(groups[0],'https://example.test/unsubscribe');
+ for(const text of ['MORNING SESSION','EVENING SESSION','10:00 AM','6:00 PM','RSVPs are open.','$10','Book costs are separate','sponsorship','schedule.html','example.test/unsubscribe','separate 24-hour'])assert.ok(body.includes(text),text);
+ const missing=invitationMail(meetingGroups({morning},0)[0],'unsubscribe');assert.ok(missing.includes('No session has been published'));
+});
+test('subscription management links are opaque, validated, and kept in URL fragments',()=>{
+ const key='a'.repeat(64),nonce='b'.repeat(64),link=subscriptionLink('unsubscribe',key,nonce);
+ assert.deepEqual(parseSubscriptionToken(key+'.'+nonce),[key,nonce]);
+ assert.ok(link.includes('subscription.html#action=unsubscribe'));assert.ok(!link.includes('@'));
+ for(const token of ['',key,'../events','a'.repeat(500)])assert.throws(()=>parseSubscriptionToken(token));
+});
 test('reminders require opt-in, remain within the send window, and stop once sent',()=>{
  const now=100000000,event={startAt:now+24*3600000};
  assert.equal(reminderDue(event,{reminderOptIn:true},now),true);
