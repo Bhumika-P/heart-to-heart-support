@@ -86,3 +86,6 @@ fieldset:disabled{opacity:.7}
 /* Clickable covers sit beside their matching workbook descriptions. */
 .workbook-entry{display:grid;grid-template-columns:120px minmax(0,1fr);gap:28px;align-items:start;margin-block:28px}.workbook-cover-link{display:block;border-radius:2px}.workbook-cover-link img{width:100%;height:auto}.workbook-entry p{margin-bottom:0}.workbook-cover-link:hover{box-shadow:0 4px 14px #650d2922}
 @media(max-width:480px){.workbook-entry{grid-template-columns:90px minmax(0,1fr);gap:16px}}
+
+/* Highlight only the three-sentence workbook summary. */
+.workbooks-content .workbook-summary{background:#fff;outline:1px solid var(--tan);outline-offset:-10px;text-align:center;padding:30px 24px;margin:30px 0}.workbook-summary span{display:block}

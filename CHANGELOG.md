@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.16 — 2026-10-24
+
+- Center the three-sentence Workbooks summary in a white box with a tan inset border, placing each sentence on its own line.
+
 ## 1.4.15 — 2026-10-24
 
 - Update the requested Workbooks sentence and link each workbook cover to its own About page.
