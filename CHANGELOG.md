@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.2 — 2026-10-23
+
+- Add Healing to the home page support, education, and encouragement line.
+
 ## 1.4.1 — 2026-10-23
 
 - Change the home page heading to “A Place for Understanding, Hope & Healing.”
