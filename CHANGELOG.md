@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.11 — 2026-10-24
+
+- Change the Resources book heading to Books by Sherée Bergman and others.
+
 ## 1.4.10 — 2026-10-24
 
 - Match the main website book cards with equal-height covers and aligned About and Buy buttons.
