@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.1 — 2026-10-23
+
+- Change the home page heading to “A Place for Understanding, Hope & Healing.”
+
 ## 1.2.9 — 2026-10-01
 
 - Set hthlifecoaching@gmail.com as the backend notification recipient default for RSVP, contact, and retry notifications.
