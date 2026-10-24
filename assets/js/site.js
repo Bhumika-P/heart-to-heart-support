@@ -17,8 +17,8 @@ if(heroLabel){
     const range=document.createRange();
     range.selectNodeContents(heroLabel);
     const textWidth=range.getBoundingClientRect().width;
-    const available=heroLabel.clientWidth;
-    if(textWidth>available&&available>0){
+    const available=Math.max(0,heroLabel.clientWidth-2);
+    if(textWidth>0&&available>0){
       const size=parseFloat(getComputedStyle(heroLabel).fontSize);
       heroLabel.style.fontSize=(Math.floor(size*available/textWidth*10)/10)+'px';
     }

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.9 — 2026-10-24
+
+- Italicize the home page welcome label and size it to fill its available width on one line.
+
 ## 1.4.8 — 2026-10-24
 
 - Keep the home page welcome label on one line and reduce its font to fit the available space after font loading and screen resizing.
