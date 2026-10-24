@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.4.12 — 2026-10-24
+
+- Credit Sherée’s son and his wife on Polaris Frequency Studio in the music section.
+- Add an intentionally blank Workbooks page linked from Transformation Guide & Breakthrough Journal, with a bottom link back to Helpful Resources.
+
 ## 1.4.11 — 2026-10-24
 
 - Change the Resources book heading to Books by Sherée Bergman and others.

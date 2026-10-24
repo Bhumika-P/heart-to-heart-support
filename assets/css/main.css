@@ -79,3 +79,6 @@ fieldset:disabled{opacity:.7}
 
 
 #books>.resource-books{margin-top:30px;max-width:900px;margin-inline:auto}.resource-book-recommendation{font-size:13px;color:var(--muted);margin:0 0 8px}.resource-book-detail .book-detail-description h2:first-child{margin-top:0}
+
+/* An intentionally empty workbook page, ready for future content. */
+.workbooks-placeholder{min-height:45vh;display:flex;align-items:flex-start;justify-content:flex-end;flex-direction:column;padding-block:40px}.workbooks-title-link{color:inherit;text-decoration:none}.workbooks-title-link:hover{text-decoration:underline}
