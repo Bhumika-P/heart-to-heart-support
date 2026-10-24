@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.4.15 — 2026-10-24
+
+- Update the requested Workbooks sentence and link each workbook cover to its own About page.
+- Wrap book About page text around the cover and use the full content width below it; keep phone layouts readable.
+
 ## 1.4.14 — 2026-10-24
 
 - Place Transformation Guide and Breakthrough Journal covers beside their matching paragraphs on Workbooks; both covers link back to Helpful Resources.
