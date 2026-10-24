@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.13 — 2026-10-24
+
+- Add the provided Transformation Guide and Breakthrough Journal explanation to Workbooks, retaining the bottom return link.
+
 ## 1.4.12 — 2026-10-24
 
 - Credit Sherée’s son and his wife on Polaris Frequency Studio in the music section.
