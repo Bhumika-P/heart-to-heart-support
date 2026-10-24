@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.8 — 2026-10-24
+
+- Keep the home page welcome label on one line and reduce its font to fit the available space after font loading and screen resizing.
+
 ## 1.4.7 — 2026-10-24
 
 - Change the upper-right home page label to Welcome to our Support Group, with wrapping for the longer wording.
