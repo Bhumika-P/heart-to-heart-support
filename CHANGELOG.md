@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.3 — 2026-10-24
+
+- Add a Support Group label at the upper right of the home page picture, with mobile spacing to keep the introduction readable.
+
 ## 1.4.2 — 2026-10-23
 
 - Add Healing to the home page support, education, and encouragement line.

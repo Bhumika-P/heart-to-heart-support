@@ -47,3 +47,8 @@ fieldset:disabled{opacity:.7}
 
 .event-subscribe{display:flex;align-items:center;gap:30px;padding:28px;margin-top:30px;background:var(--sand);border:1px solid var(--line);border-radius:5px}.event-subscribe>div{flex:1}.event-subscribe h2{font-size:34px;margin:6px 0 10px}.event-subscribe p{margin-bottom:10px}.event-subscribe>.button{flex-shrink:0;text-align:center}.event-subscribe .form-note{margin-bottom:0}#subscribe-dialog>p{margin-bottom:20px}#rsvp-form .checkbox{margin-bottom:12px}
 @media(max-width:760px){.event-subscribe{flex-direction:column;align-items:stretch;padding:23px;gap:18px}.event-subscribe h2{font-size:30px}.event-subscribe>.button{white-space:normal}}
+
+/* Label the home page picture without covering its introduction. */
+.hero{position:relative}
+.hero-label{position:absolute;top:20px;right:5%;margin:0;color:var(--wine);font:700 36px/1.1 var(--serif);text-shadow:0 1px 5px #fff8ed,0 0 14px #fff8ed}
+@media(max-width:640px){.hero-label{position:static;text-align:right;font-size:30px;margin:0 0 20px}}
