@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.6 — 2026-10-24
+
+- Change the upper-right home page picture label to Support Group Site.
+
 ## 1.4.5 — 2026-10-24
 
 - Remove Our Group from the shared navigation while keeping the detailed support group page linked from the home page Learn More button.
