@@ -82,3 +82,7 @@ fieldset:disabled{opacity:.7}
 
 /* Workbook information and its return link. */
 .workbooks-return{margin-top:32px;padding-top:22px;border-top:1px solid var(--line)}.workbooks-title-link{color:inherit;text-decoration:none}.workbooks-title-link:hover{text-decoration:underline}
+
+/* Clickable covers sit beside their matching workbook descriptions. */
+.workbook-entry{display:grid;grid-template-columns:120px minmax(0,1fr);gap:28px;align-items:start;margin-block:28px}.workbook-cover-link{display:block;border-radius:2px}.workbook-cover-link img{width:100%;height:auto}.workbook-entry p{margin-bottom:0}.workbook-cover-link:hover{box-shadow:0 4px 14px #650d2922}
+@media(max-width:480px){.workbook-entry{grid-template-columns:90px minmax(0,1fr);gap:16px}}

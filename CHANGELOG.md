@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.14 — 2026-10-24
+
+- Place Transformation Guide and Breakthrough Journal covers beside their matching paragraphs on Workbooks; both covers link back to Helpful Resources.
+
 ## 1.4.13 — 2026-10-24
 
 - Add the provided Transformation Guide and Breakthrough Journal explanation to Workbooks, retaining the bottom return link.
