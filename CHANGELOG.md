@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.7 — 2026-10-24
+
+- Change the upper-right home page label to Welcome to our Support Group, with wrapping for the longer wording.
+
 ## 1.4.6 — 2026-10-24
 
 - Change the upper-right home page picture label to Support Group Site.
