@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.4.4 — 2026-10-24
+
+- Add an About Our Support Group page covering participation, meeting expectations, topics, faith, privacy, fees, sponsorship, and joining.
+- Link the new page from Our Group navigation and the home page Learn More button.
+
 ## 1.4.3 — 2026-10-24
 
 - Add a Support Group label at the upper right of the home page picture, with mobile spacing to keep the introduction readable.

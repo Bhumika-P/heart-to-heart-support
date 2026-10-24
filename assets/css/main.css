@@ -52,3 +52,11 @@ fieldset:disabled{opacity:.7}
 .hero{position:relative}
 .hero-label{position:absolute;top:20px;right:5%;margin:0;color:var(--wine);font:700 36px/1.1 var(--serif);text-shadow:0 1px 5px #fff8ed,0 0 14px #fff8ed}
 @media(max-width:640px){.hero-label{position:static;text-align:right;font-size:30px;margin:0 0 20px}}
+
+/* Details about the support group, with a readable introduction and quick facts. */
+.group-overview{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr);gap:55px;align-items:start}
+.group-overview .eyebrow{margin-bottom:12px}.group-overview .actions{margin-top:24px}
+.group-at-a-glance{background:var(--sand);border:1px solid var(--line);border-radius:5px;padding:28px}.group-at-a-glance h2{font-size:34px;margin:8px 0 18px}.group-at-a-glance ul{padding-left:20px;margin:0 0 22px}.group-at-a-glance li+li{margin-top:10px}.group-at-a-glance>a{font-size:14px}
+.group-detail-band{background:#efebe5}.group-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:55px}.group-detail-grid p:last-child{margin-bottom:0}
+.group-details>section+section{margin-top:36px}.group-details>section>h2:first-child{margin-top:0}.group-details .soft-panel{padding:28px}.group-details .disclaimer{margin-top:36px}.group-topics{columns:2;column-gap:35px}.group-topics li{break-inside:avoid;margin-bottom:10px}.group-details ol li+li{margin-top:10px}
+@media(max-width:760px){.group-overview,.group-detail-grid{grid-template-columns:1fr;gap:28px}.group-topics{columns:1}.group-at-a-glance,.group-details .soft-panel{padding:23px}}
