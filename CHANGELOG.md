@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.5 — 2026-10-24
+
+- Remove Our Group from the shared navigation while keeping the detailed support group page linked from the home page Learn More button.
+
 ## 1.4.4 — 2026-10-24
 
 - Add an About Our Support Group page covering participation, meeting expectations, topics, faith, privacy, fees, sponsorship, and joining.
