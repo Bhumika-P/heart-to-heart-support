@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.4.10 — 2026-10-24
+
+- Match the main website book cards with equal-height covers and aligned About and Buy buttons.
+- Add book details and Ken Nair’s recommended book; retain the Words of Hope and Books by Sherée Bergman headings.
+- Preserve the music, tools, and remaining resource sections.
+
 ## 1.4.9 — 2026-10-24
 
 - Italicize the home page welcome label and size it to fill its available width on one line.
