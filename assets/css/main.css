@@ -96,3 +96,8 @@ fieldset:disabled{opacity:.7}
 @media(max-width:1100px){.header-inner{gap:14px}.brand>span{font-size:24px}.site-header nav{gap:15px}.header-join{padding-inline:12px}.footer-top nav{gap:17px}}
 @media(max-width:960px){.header-inner{gap:0}.site-header nav{gap:8px}.site-header nav a{justify-content:center;padding-inline:14px}.footer-top nav{flex-wrap:wrap}}
 @media(max-width:640px){.footer-top nav{display:flex;flex-wrap:wrap;gap:10px 20px}}
+
+/* Biography flows around the portrait and contact button; a small logo sits at upper right. */
+.about-story{padding-block:50px}.about-story>.prose{display:flow-root}.about-portrait-card{float:left;width:285px;margin:0 40px 24px 0}.about-portrait-card .portrait{width:100%;height:auto}.about-portrait-card .button{display:flex;margin-top:18px;padding-inline:15px}.about-story-logo{float:right;width:120px;height:auto;margin:0 0 20px 28px}.about-story .prose>h2:first-of-type{margin-top:0}
+@media(max-width:900px){.about-portrait-card{width:220px;margin-right:28px}.about-story-logo{width:100px;margin-left:20px}}
+@media(max-width:640px){.about-story{padding-block:30px}.about-portrait-card{float:none;width:min(100%,260px);margin:0 auto 28px}.about-story-logo{width:90px;margin-left:18px}}

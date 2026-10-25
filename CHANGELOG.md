@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.5.2 — 2026-10-25
+
+- Move the smaller coaching logo to the upper-right of the biography text.
+- Put Connect with Sherée directly under her portrait and wrap the biography around the picture and button.
+
 ## 1.5.1 — 2026-10-25
 
 - Remove the Back to Main Website button from the home page picture and its reserved mobile spacing; retain Main Website in the navigation.
