@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.17 — 2026-10-25
+
+- Add a Back to Main Website button at the bottom-right of the home page picture, linking to the main website home page.
+
 ## 1.4.16 — 2026-10-24
 
 - Center the three-sentence Workbooks summary in a white box with a tan inset border, placing each sentence on its own line.
