@@ -93,3 +93,9 @@ fieldset:disabled{opacity:.7}
 /* Return to the main site from the lower-right corner of the home picture. */
 .hero-main-site{position:absolute;right:5%;bottom:24px}
 @media(max-width:760px){.hero{padding-bottom:90px}.hero-main-site{max-width:90%}}
+
+/* Match the main site's navigation typography and spacing. */
+.site-header nav a{font-size:13px;min-height:44px;display:inline-flex;align-items:center}.header-inner{gap:23px}.site-header nav{gap:22px}.header-join{font-size:10px;padding-inline:20px}.brand small{letter-spacing:3.8px}.footer-top nav a{font-size:13px;display:inline-flex;align-items:center;min-height:44px}
+@media(max-width:1100px){.header-inner{gap:14px}.brand>span{font-size:24px}.site-header nav{gap:15px}.header-join{padding-inline:12px}.footer-top nav{gap:17px}}
+@media(max-width:960px){.header-inner{gap:0}.site-header nav{gap:8px}.site-header nav a{justify-content:center;padding-inline:14px}.footer-top nav{flex-wrap:wrap}}
+@media(max-width:640px){.footer-top nav{display:flex;flex-wrap:wrap;gap:10px 20px}}

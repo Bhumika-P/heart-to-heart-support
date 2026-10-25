@@ -23,7 +23,7 @@ paths={
 }
 def icon(name):return f'<svg class="icon" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{paths[name]}"/></svg>'
 brand=f'<a class="brand" href="index.html" aria-label="Heart to Heart Hope and Healing home">{icon("heart")}<span>HEART <i>to</i> HEART<small>HOPE &amp; HEALING</small></span></a>'
-nav=[('index.html','Home'),('about.html','About'),('schedule.html','Group Sessions'),('resources.html','Resources'),('faq.html','FAQ'),('contact.html','Contact')]
+nav=[('index.html','Home'),('about.html','About'),('schedule.html','Group Sessions'),('resources.html','Resources'),('faq.html','FAQ'),('contact.html','Contact'),('https://hearttoheartlifecoaching.com/','Main Website')]
 def links(active):return ''.join(f'<a href="{url}"'+(' aria-current="page"' if url==active else '')+f'>{label}</a>' for url,label in nav)
 def page(filename,title,body,script=None):
     # Forms stay inert until their JavaScript is ready; never fall back to GET.

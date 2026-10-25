@@ -1,3 +1,5 @@
+// Normalize explicit index filenames while preserving RSVP filters and subscription fragments.
+if(location.pathname.endsWith('/index.html'))history.replaceState(null,'',location.pathname.slice(0,-10)+location.search+location.hash);
 const toggle=document.querySelector('.menu-toggle'),nav=document.querySelector('#navigation');
 toggle?.addEventListener('click',()=>{const open=toggle.getAttribute('aria-expanded')!=='true';toggle.setAttribute('aria-expanded',String(open));toggle.setAttribute('aria-label',open?'Close menu':'Open menu');nav.classList.toggle('open',open);});
 document.addEventListener('keydown',event=>{if(event.key==='Escape'&&nav?.classList.contains('open')){nav.classList.remove('open');toggle.setAttribute('aria-expanded','false');toggle.focus();}});
@@ -6,7 +8,7 @@ document.querySelector('[data-print]')?.addEventListener('click',()=>window.prin
 // Preserve emulator routing only on loopback, never on deployed pages.
 if(['localhost','127.0.0.1'].includes(location.hostname)&&new URLSearchParams(location.search).get('emulator')==='1'){
   const banner=document.createElement('div');banner.className='preview-banner';banner.textContent='Local test preview · Sample data only · No email is sent';document.body.prepend(banner);
-  document.querySelectorAll('a[href]').forEach(a=>{const u=new URL(a.href);if(u.origin===location.origin&&u.pathname.endsWith('.html')){u.searchParams.set('emulator','1');a.href=u.href;}});
+  document.querySelectorAll('a[href]').forEach(a=>{const u=new URL(a.href);if(u.origin===location.origin&&!u.pathname.startsWith('/assets/')){u.searchParams.set('emulator','1');a.href=u.href;}});
 }
 
 // Keep the welcome message on one line at the largest size its space allows.

@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.5.0 — 2026-10-25
+
+- Match the main website navigation typography and spacing and add a Main Website menu link.
+- Publish support pages at clean directory URLs, with redirects preserving query strings and fragments from older .html links.
+- Keep nested page assets and dynamic links rooted correctly.
+
 ## 1.4.17 — 2026-10-25
 
 - Add a Back to Main Website button at the bottom-right of the home page picture, linking to the main website home page.

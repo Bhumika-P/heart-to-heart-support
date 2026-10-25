@@ -2,6 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile,readdir} from 'node:fs/promises';
 import {resolve} from 'node:path';
+import {runInNewContext} from 'node:vm';
+import {pagePath,legacyRedirect} from '../scripts/routes.mjs';
 import {eventInput,occurrences,rsvpInput,contactInput} from '../functions/validation.js';
 const base={name:'Morning support',description:'A welcoming session.',locationTitle:'Community room',address:'123 Example Street',timezone:'America/Chicago',session:'morning',startLocal:'2030-10-26T10:00',endLocal:'2030-10-26T11:30',rsvpOpen:true};
 test('biweekly recurrence preserves local time across daylight saving',()=>{const rows=occurrences({...base,occurrences:3},0);assert.equal(rows.length,3);assert.equal(rows[1].startLocal,'2030-11-09T10:00');assert.equal(rows[1].startAt-rows[0].startAt,14*86400000+3600000);});
@@ -9,8 +11,16 @@ test('event validation rejects invalid duration, recurrence, zones and past date
 test('forms validate data and normalize email without HTML interpretation',()=>{assert.equal(rsvpInput({eventId:'abc',name:'<script>name</script>',email:' PERSON@EXAMPLE.COM '}).email,'person@example.com');assert.throws(()=>rsvpInput({eventId:'../admins',name:'X',email:'a@b.com'}));assert.throws(()=>contactInput({name:'X',email:'x@y.com\r\nBcc:a@b.com',subject:'X',message:'This is a message'}));assert.throws(()=>contactInput({name:'X',email:'a@b.com',subject:'X',message:'short'}));});
 test('public HTML preserves the complete source home and about wording',async()=>{const source=JSON.parse((await readFile(new URL('../docs/source-content.json',import.meta.url),'utf8')).replace(/^\uFEFF/,''));const escape=s=>s.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#x27;');for(const [key,file,start] of [['Home Page','index.html',1],['ABOUT','about.html',2]]){const page=await readFile(new URL('../'+file,import.meta.url),'utf8');for(const paragraph of source[key].slice(start))assert.ok(page.includes(escape(paragraph)),`${file} missing: ${paragraph.slice(0,70)}`);}});
 test('rules expose events only and never permit direct client writes',async()=>{const rules=JSON.parse(await readFile(new URL('../firebase-realtime-database-rules.json',import.meta.url),'utf8'));assert.equal(rules.rules['.read'],false);assert.equal(rules.rules['.write'],false);assert.equal(rules.rules.events['.read'],true);assert.match(rules.rules.rsvps['.read'],/admins/);assert.match(rules.rules.messages['.read'],/admins/);});
-test('release versions agree in packages, public metadata, and every built footer',async()=>{const root=resolve(import.meta.dirname,'..');const pkg=JSON.parse(await readFile(resolve(root,'package.json'),'utf8'));const functions=JSON.parse(await readFile(resolve(root,'functions/package.json'),'utf8'));assert.equal(functions.version,pkg.version);assert.equal((await readFile(resolve(root,'dist/assets/data/version.txt'),'utf8')).trim(),pkg.version);for(const file of (await readdir(resolve(root,'dist'))).filter(f=>f.endsWith('.html'))){assert.ok((await readFile(resolve(root,'dist',file),'utf8')).includes(`<span data-version>v${pkg.version}</span>`));}});
-test('all internal HTML file links resolve and public build excludes private source files',async()=>{const root=resolve(import.meta.dirname,'..');for(const file of (await readdir(root)).filter(f=>f.endsWith('.html'))){const page=await readFile(resolve(root,file),'utf8');for(const match of page.matchAll(/(?:href|src)="([^"]+)"/g)){const url=match[1];if(/^(https?:|#|mailto:)/.test(url))continue;const path=decodeURIComponent(url.split(/[?#]/)[0]);if(path.startsWith('assets/js/'))continue;await readFile(resolve(root,path));}}const dist=await readdir(resolve(root,'dist'));assert.ok(!dist.includes('admins.txt'));assert.ok(!dist.includes('functions'));const contact=await readFile(resolve(root,'dist/contact.html'),'utf8');assert.ok(!contact.includes('heartsriseagain@gmail.com'));});
+test('release versions agree in packages, public metadata, and every canonical page',async()=>{
+ const root=resolve(import.meta.dirname,'..'),pkg=JSON.parse(await readFile(resolve(root,'package.json'),'utf8'));
+ assert.equal(JSON.parse(await readFile(resolve(root,'functions/package.json'),'utf8')).version,pkg.version);
+ assert.equal((await readFile(resolve(root,'dist/assets/data/version.txt'),'utf8')).trim(),pkg.version);
+ for(const file of (await readdir(root)).filter(f=>f.endsWith('.html'))){
+  const output=file==='index.html'?'index.html':file.slice(0,-5)+'/index.html';
+  assert.ok((await readFile(resolve(root,'dist',output),'utf8')).includes(`<span data-version>v${pkg.version}</span>`),output);
+ }
+});
+test('all internal HTML file links resolve and public build excludes private source files',async()=>{const root=resolve(import.meta.dirname,'..');for(const file of (await readdir(root)).filter(f=>f.endsWith('.html'))){const page=await readFile(resolve(root,file),'utf8');for(const match of page.matchAll(/(?:href|src)="([^"]+)"/g)){const url=match[1];if(/^(https?:|#|mailto:)/.test(url))continue;const path=decodeURIComponent(url.split(/[?#]/)[0]);if(path.startsWith('assets/js/'))continue;await readFile(resolve(root,path));}}const dist=await readdir(resolve(root,'dist'));assert.ok(!dist.includes('admins.txt'));assert.ok(!dist.includes('functions'));const contact=await readFile(resolve(root,'dist/contact/index.html'),'utf8');assert.ok(!contact.includes('heartsriseagain@gmail.com'));});
 
 import {participantMail,reminderDue} from '../functions/participant-mail.js';
 import {meetingGroups,invitationDue,invitationMail,parseSubscriptionToken,subscriptionLink} from '../functions/event-subscriptions.js';
@@ -62,4 +72,31 @@ test('confirmation and reminder include the selected session and contact informa
  for(const phrase of ['Morning meeting','10:00 AM','12:00 PM','Community Room','123 Example Street','$10','hthlifecoaching@gmail.com','schedule.html','requested a reminder'])assert.ok(confirmation.includes(phrase),phrase);
  assert.ok(!participantMail({reminderOptIn:false},event).includes('requested a reminder'));
  assert.ok(participantMail({},event,true).includes('requested reminder'));
+});
+
+test('clean live pages link to real directory pages and rooted assets',async()=>{
+ const root=resolve(import.meta.dirname,'..'),dist=resolve(root,'dist');
+ for(const file of (await readdir(root)).filter(f=>f.endsWith('.html'))){
+  const output=file==='index.html'?'index.html':file.slice(0,-5)+'/index.html';
+  const html=await readFile(resolve(dist,output),'utf8');
+  assert.ok(html.includes(`https://support.hearttoheartlifecoaching.com${pagePath(file)}`));
+  for(const [,url] of html.matchAll(/(?:href|src)="([^"]+)"/g)){
+   if(/^(https?:|#|mailto:)/.test(url))continue;
+   assert.ok(url.startsWith('/'),`${output}: unrooted ${url}`);
+   assert.ok(!/\.html(?:[?#]|$)/.test(url),`${output}: old page URL ${url}`);
+   const path=decodeURIComponent(url.split(/[?#]/)[0]);
+   await readFile(resolve(dist,'.'+path+(path.endsWith('/')?'index.html':'')));
+  }
+ }
+ const home=await readFile(resolve(dist,'index.html'),'utf8');
+ assert.match(home,/<a href="https:\/\/hearttoheartlifecoaching.com\/">Main Website<\/a>/);
+ const schedule=await readFile(resolve(dist,'schedule/index.html'),'utf8');
+ assert.ok(schedule.includes('id="subscribe-dialog"'));assert.ok(schedule.includes('name="subscriptionOptIn"'));
+});
+test('legacy page redirects preserve RSVP filters and opaque subscription fragments',()=>{
+ for(const [path,search,hash] of [['/schedule/','?session=evening',''],['/subscription/','','#action=confirm&token=opaque-token']]){
+  const html=legacyRedirect(path),script=html.match(/<script>([\s\S]*?)<\/script>/)[1];let destination;
+  runInNewContext(script,{URL,location:{origin:'https://support.hearttoheartlifecoaching.com',search,hash,replace:url=>{destination=url;}}});
+  assert.equal(destination,'https://support.hearttoheartlifecoaching.com'+path+search+hash);
+ }
 });

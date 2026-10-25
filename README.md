@@ -56,3 +56,5 @@ Version 1.2.9 includes the reviewed home-page corrections and updated confidenti
 The public website is published at https://bhumika-p.github.io/heart-to-heart-support/ by `.github/workflows/pages.yml`. Pages must use **GitHub Actions** as its build source. The workflow builds and tests the site, then publishes only `dist`. Do not publish the source HTML directly: its Firebase imports need bundling.
 
 For a release, run `npm version minor --no-git-tag-version` (or `patch`), then `npm run version:sync`. Run `npm install --package-lock-only` from inside the `functions` directory. Regenerate source HTML with `python scripts/create-pages.py`, update `CHANGELOG.md`, build and test, commit, and tag the matching `vX.Y.Z`. The build checks package/public version consistency and versions CSS/JavaScript URLs.
+
+Live pages use clean directory addresses such as `/resources/` and `/schedule/`. The build keeps `.html` redirect pages for existing bookmarks and emails, preserving query strings and subscription fragments. Source HTML stays usable for editing; publish only `dist`.

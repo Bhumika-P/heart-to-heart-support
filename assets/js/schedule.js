@@ -9,7 +9,7 @@ function render(){
   if(!list)return;
   document.querySelectorAll('[data-filter]').forEach(button=>{button.classList.toggle('active',button.dataset.filter===filter);button.setAttribute('aria-pressed',String(button.dataset.filter===filter));});
   const shown=events.filter(e=>filter==='all'||e.session===filter);list.replaceChildren();notice.textContent='';
-  if(!shown.length){const panel=el('div',undefined,'empty-state');panel.append(el('h2','New sessions are on their way'),el('p','There are no published upcoming sessions in this view. Please check back soon or contact Sherée with a question.'));const link=el('a','Contact Sherée');link.href='contact.html';panel.append(link);list.append(panel);return;}
+  if(!shown.length){const panel=el('div',undefined,'empty-state');panel.append(el('h2','New sessions are on their way'),el('p','There are no published upcoming sessions in this view. Please check back soon or contact Sherée with a question.'));const link=el('a','Contact Sherée');link.href='/contact/';panel.append(link);list.append(panel);return;}
   for(const event of shown){
     const card=el('article',undefined,'event-card');card.append(el('p',`${event.session==='morning'?'Morning':'Evening'} Session`,'eyebrow'),el('h2',event.name),el('p',eventTime(event),'event-date'),el('p',`${event.locationTitle}\n${event.address}`,'event-location'),el('p',event.description));
     if(event.rsvpOpen)card.append(action('RSVP for This Session',()=>openRsvp(event),'button'));else card.append(el('p','RSVPs are currently closed.','badge'));

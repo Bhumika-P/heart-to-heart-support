@@ -1,6 +1,7 @@
 import {mkdir,cp,readdir,rm,readFile,writeFile} from 'node:fs/promises';
 import {resolve} from 'node:path';
 import {build} from 'esbuild';
+import {pagePath,publicHtml,legacyRedirect} from './routes.mjs';
 const root=resolve(import.meta.dirname,'..');
 const {version}=JSON.parse(await readFile(resolve(root,'package.json'),'utf8'));
 const functionsPackage=JSON.parse(await readFile(resolve(root,'functions/package.json'),'utf8'));
@@ -10,13 +11,20 @@ const dist=resolve(root,'dist');
 if(dist!==resolve(root,'dist')) throw Error('Invalid output');
 await rm(dist,{recursive:true,force:true});
 await mkdir(dist,{recursive:true});
-for(const name of await readdir(root)){if(name.endsWith('.html')){
+const pages=(await readdir(root)).filter(name=>name.endsWith('.html'));
+for(const name of pages){
   let html=await readFile(resolve(root,name),'utf8');
   html=html.replace(/<span data-version>[^<]*<\/span>/g,`<span data-version>v${version}</span>`);
   html=html.replaceAll('assets/css/main.css"',`assets/css/main.css?v=${version}"`);
   html=html.replace(/src="assets\/js\/([^"?]+)"/g,`src="assets/js/$1?v=${version}"`);
-  await writeFile(resolve(dist,name),html);
-}}
+  html=publicHtml(html,pages);
+  const path=pagePath(name);
+  html=html.replace('</head>',`<link rel="canonical" href="https://support.hearttoheartlifecoaching.com${path}"></head>`);
+  const output=name==='index.html'?dist:resolve(dist,name.slice(0,-5));
+  await mkdir(output,{recursive:true});
+  await writeFile(resolve(output,'index.html'),html);
+  if(name!=='index.html')await writeFile(resolve(dist,name),name==='404.html'?html:legacyRedirect(path));
+}
 for(const folder of ['css','img','files','data'])await cp(resolve(root,'assets',folder),resolve(dist,'assets',folder),{recursive:true});
 await writeFile(resolve(dist,'.nojekyll'),'');
 await build({absWorkingDir:root,entryPoints:['assets/js/site.js','assets/js/schedule.js','assets/js/contact.js','assets/js/admin.js','assets/js/subscription.js'],outdir:'dist/assets/js',bundle:true,splitting:true,format:'esm',minify:true,target:['es2022'],sourcemap:false});
