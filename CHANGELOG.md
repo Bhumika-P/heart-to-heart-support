@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.5.7 — 2026-10-25
+
+- Add a little more space above and below the home page welcome message while keeping its size and style.
+
 ## 1.5.6 — 2026-10-25
 
 - Enlarge the italic welcome message and reduce the vertical spacing between the home page picture and feature boxes.
