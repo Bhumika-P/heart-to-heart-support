@@ -50,7 +50,7 @@ fieldset:disabled{opacity:.7}
 
 /* Label the home page picture without covering its introduction. */
 .hero{position:relative}
-.hero-welcome{background:#efebe5;padding-top:10px}.hero-welcome+.pillars{padding-top:12px}.hero-label{--welcome-max:46px;width:min(800px,90%);white-space:nowrap;text-align:center;margin:0 auto;color:var(--wine);font:italic 700 46px/1 var(--serif)}
+.hero-welcome{background:#efebe5;padding-top:10px}.hero-welcome+.pillars{padding-top:12px}.hero-label{--welcome-max:46px;width:min(920px,90%);display:flex;justify-content:center;align-items:center;gap:14px;white-space:nowrap;text-align:center;margin:0 auto;color:var(--wine);font:italic 700 46px/1 var(--serif)}
 @media(max-width:640px){.hero-label{--welcome-max:34px;font-size:34px}.subtitle-break{display:none}}
 
 /* Details about the support group, with a readable introduction and quick facts. */
@@ -105,3 +105,5 @@ fieldset:disabled{opacity:.7}
 /* Approved coaching path background with a translucent cream overlay. */
 .hero{background:linear-gradient(90deg,rgba(251,248,243,.96) 0%,rgba(251,248,243,.91) 34%,rgba(251,248,243,.65) 49%,rgba(251,248,243,.12) 68%,transparent 82%),url('/assets/img/scenery/coaching-path-sharp.webp') center/cover no-repeat}
 @media(max-width:640px){.hero{background:linear-gradient(90deg,rgba(251,248,243,.95),rgba(251,248,243,.82) 65%,rgba(251,248,243,.55)),url('/assets/img/scenery/coaching-path-sharp.webp') 65% center/cover no-repeat}}
+
+.hero-label>.icon{width:.8em;height:.8em;flex-shrink:0;stroke-width:2.7}.welcome-text{flex-shrink:0}.understanding-learn-more{margin-top:18px}.donate-content h2{font-size:34px}.donate-back{margin-top:28px}@media(max-width:640px){.hero-label{gap:8px}}

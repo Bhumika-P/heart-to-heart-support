@@ -17,9 +17,11 @@ if(heroLabel){
   const fitWelcome=()=>{
     heroLabel.style.fontSize=getComputedStyle(heroLabel).getPropertyValue('--welcome-max').trim();
     const range=document.createRange();
-    range.selectNodeContents(heroLabel);
+    range.selectNodeContents(heroLabel.querySelector(".welcome-text")||heroLabel);
     const textWidth=range.getBoundingClientRect().width;
-    const available=Math.max(0,heroLabel.clientWidth-2);
+    const decorations=[...heroLabel.querySelectorAll(".icon")].reduce((sum,el)=>sum+el.getBoundingClientRect().width,0);
+    const gaps=heroLabel.querySelector(".welcome-text")?2*parseFloat(getComputedStyle(heroLabel).columnGap):0;
+    const available=Math.max(0,heroLabel.clientWidth-decorations-gaps-2);
     if(textWidth>0&&available>0){
       const size=parseFloat(getComputedStyle(heroLabel).fontSize);
       heroLabel.style.fontSize=(Math.floor(Math.min(size,size*available/textWidth)*10)/10)+'px';

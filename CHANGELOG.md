@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.5.8 — 2026-10-26
+
+- Frame the welcome message with matching heart outlines.
+- Add Donate beside Join a Session with the existing donations and sponsorships content and PayPal destination.
+- Move Learn More below the introduction in You Are Not Alone, retaining its page link and outline style.
+
 ## 1.5.7 — 2026-10-25
 
 - Add a little more space above and below the home page welcome message while keeping its size and style.
