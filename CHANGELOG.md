@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.5.4 — 2026-10-25
+
+- Replace the enlarged coaching thumbnail with a restored high-resolution landscape for clearer rocks, trees, and path details; preserve the approved cream overlay and layout.
+
 ## 1.5.3 — 2026-10-25
 
 - Use the approved coaching path image on the home page with a translucent cream overlay for readable text on desktop and mobile.
