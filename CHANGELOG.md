@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.5.11 — 2026-10-26
+
+- Fill both welcome hearts with matching #C5A46B gold and thicken their burgundy outlines.
+
 ## 1.5.10 — 2026-10-26
 
 - Change the home page welcome lettering to #C5A46B with a very thin burgundy outline.

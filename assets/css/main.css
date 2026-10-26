@@ -106,7 +106,7 @@ fieldset:disabled{opacity:.7}
 .hero{background:linear-gradient(90deg,rgba(251,248,243,.96) 0%,rgba(251,248,243,.91) 34%,rgba(251,248,243,.65) 49%,rgba(251,248,243,.12) 68%,transparent 82%),url('/assets/img/scenery/coaching-path-sharp.webp') center/cover no-repeat}
 @media(max-width:640px){.hero{background:linear-gradient(90deg,rgba(251,248,243,.95),rgba(251,248,243,.82) 65%,rgba(251,248,243,.55)),url('/assets/img/scenery/coaching-path-sharp.webp') 65% center/cover no-repeat}}
 
-.hero-label>.icon{width:.8em;height:.8em;flex-shrink:0;stroke-width:2.7}.welcome-text{flex-shrink:0}.understanding-learn-more{margin-top:18px}.donate-content h2{font-size:34px}.donate-back{margin-top:28px}@media(max-width:640px){.hero-label{gap:8px}}
+.hero-label>.icon{width:.8em;height:.8em;flex-shrink:0;fill:#c5a46b;stroke:var(--wine);stroke-width:4}.welcome-text{flex-shrink:0}.understanding-learn-more{margin-top:18px}.donate-content h2{font-size:34px}.donate-back{margin-top:28px}@media(max-width:640px){.hero-label{gap:8px}}
 
 /* Gold welcome lettering with a fine burgundy outline. */
 .welcome-text{color:#c5a46b;-webkit-text-stroke:.5px var(--wine);paint-order:stroke fill}
