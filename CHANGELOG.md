@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.5.5 — 2026-10-25
+
+- Change the home page heading to Your Path for Understanding, Hope & Healing.
+- Adjust the introduction line breaks and move the italic welcome message below the picture, above the three feature boxes.
+
 ## 1.5.4 — 2026-10-25
 
 - Replace the enlarged coaching thumbnail with a restored high-resolution landscape for clearer rocks, trees, and path details; preserve the approved cream overlay and layout.

@@ -50,8 +50,8 @@ fieldset:disabled{opacity:.7}
 
 /* Label the home page picture without covering its introduction. */
 .hero{position:relative}
-.hero-label{--welcome-max:34px;position:absolute;top:20px;right:5%;width:42%;white-space:nowrap;text-align:right;margin:0;color:var(--wine);font:italic 700 min(34px,3vw)/1.1 var(--serif);text-shadow:0 1px 5px #fff8ed,0 0 14px #fff8ed}
-@media(max-width:640px){.hero-label{--welcome-max:30px;position:static;width:100%;text-align:right;font-size:min(30px,6.5vw);margin:0 0 20px}}
+.hero-welcome{background:#efebe5;padding-top:20px}.hero-label{--welcome-max:34px;width:min(600px,90%);white-space:nowrap;text-align:center;margin:0 auto;color:var(--wine);font:italic 700 34px/1.1 var(--serif)}
+@media(max-width:640px){.hero-label{--welcome-max:30px;font-size:30px}.subtitle-break{display:none}}
 
 /* Details about the support group, with a readable introduction and quick facts. */
 .group-overview{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr);gap:55px;align-items:start}

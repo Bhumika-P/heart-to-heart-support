@@ -22,7 +22,7 @@ if(heroLabel){
     const available=Math.max(0,heroLabel.clientWidth-2);
     if(textWidth>0&&available>0){
       const size=parseFloat(getComputedStyle(heroLabel).fontSize);
-      heroLabel.style.fontSize=(Math.floor(size*available/textWidth*10)/10)+'px';
+      heroLabel.style.fontSize=(Math.floor(Math.min(size,size*available/textWidth)*10)/10)+'px';
     }
   };
   fitWelcome();
