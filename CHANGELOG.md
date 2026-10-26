@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.5.6 — 2026-10-25
+
+- Enlarge the italic welcome message and reduce the vertical spacing between the home page picture and feature boxes.
+
 ## 1.5.5 — 2026-10-25
 
 - Change the home page heading to Your Path for Understanding, Hope & Healing.
