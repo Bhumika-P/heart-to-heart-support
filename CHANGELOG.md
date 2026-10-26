@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.5.9 — 2026-10-26
+
+- Add branded burgundy-and-cream HTML contact notifications labeled Support Group, with contact details, subject, message, and a sender reply button.
+- Preserve native Reply-To, plain-text alternatives, and the same formatting when retrying a contact notification.
+
 ## 1.5.8 — 2026-10-26
 
 - Frame the welcome message with matching heart outlines.

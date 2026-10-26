@@ -3,6 +3,7 @@ import {getDatabase} from 'firebase-admin/database';
 import {onCall,HttpsError} from 'firebase-functions/v2/https';
 import {onSchedule} from 'firebase-functions/v2/scheduler';
 import {participantMail,reminderDue} from './participant-mail.js';
+import {contactMail} from './contact-email.js';
 import {subscriptionService,parseSubscriptionToken} from './event-subscriptions.js';
 import {onInit} from 'firebase-functions/v2/core';
 import {defineSecret,defineString} from 'firebase-functions/params';
@@ -47,12 +48,16 @@ async function notify(path,subject,body,replyTo,to=mailTo.value(),field='deliver
     if(emulated){await delivery.set({status:'sent',at:Date.now(),emulated:true});return true;}
     if(!mailTo.value()||!mailFrom.value()||!smtp.value())throw Error('Email provider not configured');
     const transport=nodemailer.createTransport(smtp.value(),{connectionTimeout:10000,socketTimeout:15000});
-    await transport.sendMail({from:mailFrom.value(),to,replyTo,subject,text:body});
+    await transport.sendMail({from:mailFrom.value(),to,replyTo,subject,...(typeof body==='string'?{text:body}:body)});
     await delivery.set({status:'sent',at:Date.now()});
     return true;
   }catch{await delivery.set({status:'failed',at:Date.now()});return false;}
 }
 function rsvpMail(record,event){return `A session RSVP has been received.\n\nName: ${record.name}\nEmail: ${record.email}\nSession: ${event.name}\nWhen: ${new Intl.DateTimeFormat('en-US',{dateStyle:'full',timeStyle:'short',timeZone:event.timezone}).format(event.startAt)} (${event.timezone})\nLocation: ${event.locationTitle}\n${event.address}\n\nView attendees in the admin dashboard. Please keep participant information confidential.`;}
+function notifyContact(path,record){
+  const mail=contactMail(record);
+  return notify(path,mail.subject,{text:mail.text,html:mail.html},mail.replyTo);
+}
 export const saveEvent=onCall(options,async request=>{
   await admin(request);
   const data=request.data||{};
@@ -123,7 +128,7 @@ export const submitContact=onCall({...options,secrets:[smtp]},async request=>{
   const requestId=validate(id,request.data.requestId);
   const key=hash(data.email+requestId),path=`messages/${key}`;
   const result=await db.ref(path).transaction(old=>old?undefined:{...data,createdAt:Date.now(),delivery:{status:'pending',at:Date.now()}});
-  if(result.committed)await notify(path,`Website contact: ${data.subject}`,`Name: ${data.name}\nEmail: ${data.email}\n\n${data.message}`,data.email);
+  if(result.committed)await notifyContact(path,data);
   return {ok:true,message:'Thank you. Your message has been received.'};
 });
 export const retryNotification=onCall({...options,secrets:[smtp]},async request=>{
@@ -137,7 +142,7 @@ export const retryNotification=onCall({...options,secrets:[smtp]},async request=
   }else if(data.kind==='contact'){
     path=`messages/${validate(id,data.recordId)}`;record=(await db.ref(path).get()).val();
     if(!record)throw new HttpsError('not-found','Message not found.');
-    await notify(path,`Website contact: ${record.subject}`,`Name: ${record.name}\nEmail: ${record.email}\n\n${record.message}`,record.email);
+    await notifyContact(path,record);
   }else throw new HttpsError('invalid-argument','Invalid notification type.');
   return {status:(await db.ref(`${path}/${data.audience==='participant'?'confirmationDelivery':'delivery'}/status`).get()).val()};
 });
