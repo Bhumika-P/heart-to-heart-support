@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.5.10 — 2026-10-26
+
+- Change the home page welcome lettering to #C5A46B with a very thin burgundy outline.
+
 ## 1.5.9 — 2026-10-26
 
 - Add branded burgundy-and-cream HTML contact notifications labeled Support Group, with contact details, subject, message, and a sender reply button.
