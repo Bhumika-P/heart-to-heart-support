@@ -15,7 +15,7 @@ const pages=(await readdir(root)).filter(name=>name.endsWith('.html'));
 for(const name of pages){
   let html=await readFile(resolve(root,name),'utf8');
   html=html.replace(/<span data-version>[^<]*<\/span>/g,`<span data-version>v${version}</span>`);
-  html=html.replaceAll('assets/css/main.css"',`assets/css/main.css?v=${version}"`);
+  html=html.replaceAll('assets/css/main.css"',`assets/css/main.css?v=${version}-logo1"`);
   html=html.replace(/src="assets\/js\/([^"?]+)"/g,`src="assets/js/$1?v=${version}"`);
   html=publicHtml(html,pages);
   const path=pagePath(name);
